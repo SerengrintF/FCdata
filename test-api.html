@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 테스트</title>
+</head>
+<body>
+    <h1>넥슨 FC온라인 API 테스트</h1>
+    <button onclick="testAPI()">API 테스트 실행</button>
+    <div id="result"></div>
+
+    <script>
+        const API_KEY = 'live_72e6c00482ffc1def6dde5f00b426e8d07b3d0335525104d8d9b7fe6b1a579a2efe8d04e6d233bd35cf2fabdeb93fb0d';
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '테스트 중...';
+            
+            // 여러 가능한 엔드포인트와 헤더 조합 테스트
+            const testCases = [
+                {
+                    url: 'https://open.api.nexon.com/fconline/v1/user/basic?nickname=test',
+                    headers: { 'x-nxopen-api-key': API_KEY }
+                },
+                {
+                    url: 'https://open.api.nexon.com/fconline/v1/user?nickname=test',
+                    headers: { 'x-nxopen-api-key': API_KEY }
+                },
+                {
+                    url: 'https://open.api.nexon.com/fconline/v1/user/basic?nickname=test',
+                    headers: { 'x-api-key': API_KEY }
+                },
+                {
+                    url: 'https://open.api.nexon.com/fconline/v1/user/basic?nickname=test',
+                    headers: { 'Authorization': `Bearer ${API_KEY}` }
+                },
+                {
+                    url: 'https://open.api.nexon.com/fconline/v1/user/basic?nickname=test',
+                    headers: { 'x-nxopen-api-key': API_KEY, 'Content-Type': 'application/json' }
+                }
+            ];
+            
+            let results = '<h2>테스트 결과:</h2>';
+            
+            for (let i = 0; i < testCases.length; i++) {
+                const testCase = testCases[i];
+                try {
+                    console.log(`테스트 ${i + 1}:`, testCase);
+                    
+                    const response = await fetch(testCase.url, {
+                        method: 'GET',
+                        headers: testCase.headers
+                    });
+                    
+                    const status = response.status;
+                    const statusText = response.statusText;
+                    
+                    let responseText = '';
+                    try {
+                        responseText = await response.text();
+                    } catch (e) {
+                        responseText = '응답 텍스트 읽기 실패';
+                    }
+                    
+                    results += `
+                        <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+                            <h3>테스트 ${i + 1}</h3>
+                            <p><strong>URL:</strong> ${testCase.url}</p>
+                            <p><strong>헤더:</strong> ${JSON.stringify(testCase.headers)}</p>
+                            <p><strong>상태:</strong> ${status} ${statusText}</p>
+                            <p><strong>응답:</strong> ${responseText}</p>
+                        </div>
+                    `;
+                    
+                } catch (error) {
+                    results += `
+                        <div style="border: 1px solid red; margin: 10px; padding: 10px;">
+                            <h3>테스트 ${i + 1} - 오류</h3>
+                            <p><strong>URL:</strong> ${testCase.url}</p>
+                            <p><strong>헤더:</strong> ${JSON.stringify(testCase.headers)}</p>
+                            <p><strong>오류:</strong> ${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            resultDiv.innerHTML = results;
+        }
+    </script>
+
+    <footer style="text-align: center; padding: 2rem 1rem; margin-top: 3rem; color: #666; font-size: 0.875rem; border-top: 1px solid #e0e0e0;">
+        Data based on NEXON Open API
+    </footer>
+</body>
+</html>
+

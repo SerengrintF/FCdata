@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FC온라인 분석 도구</title>
+    <!-- Common Styles -->
+    <link rel="stylesheet" href="css/common.css">
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="css/dashboard.css">
+    <!-- Team Data Styles -->
+    <link rel="stylesheet" href="css/team.css">
+    <!-- Formation Analysis Styles -->
+    <link rel="stylesheet" href="css/formation.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://openapi.nexon.com/js/analytics.js?app_id=201448" async></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 섹션 -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="logo" id="logo">
+                    <img src="logo.svg" alt="FC Data" class="logo-image">
+                </div>
+                <div class="header-actions">
+                    <a href="https://www.youtube.com/@sereng88" target="_blank" class="action-btn primary youtube-btn" id="followBtn">
+                        <svg class="youtube-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        <span>Youtube</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- 검색 섹션 -->
+        <div class="search-section">
+            <div class="search-box">
+                <div class="search-input-container">
+                    <input type="text" id="nicknameInput" placeholder="유저 닉네임을 입력하세요" maxlength="20" autocomplete="off">
+                    <div class="search-dropdown" id="searchDropdown" style="display: none;">
+                        <div class="dropdown-section">
+                            <div class="dropdown-header">
+                                <span class="dropdown-title">즐겨찾기</span>
+                                <button class="clear-favorites-btn" id="clearFavoritesBtn" title="즐겨찾기 모두 삭제">🗑️</button>
+                            </div>
+                            <div class="favorites-list" id="favoritesList">
+                                <!-- 즐겨찾기 목록이 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                        <div class="dropdown-section">
+                            <div class="dropdown-header">
+                                <span class="dropdown-title">최근 검색</span>
+                                <button class="clear-history-btn" id="clearHistoryBtn" title="검색 기록 모두 삭제">🗑️</button>
+                            </div>
+                            <div class="history-list" id="historyList">
+                                <!-- 검색 기록이 여기에 표시됩니다 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="searchBtn">검색</button>
+            </div>
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <span>검색 중...</span>
+            </div>
+        </div>
+
+        <!-- 선수 기본 정보 섹션 -->
+        <div class="player-basic-info" id="playerBasicInfo" style="display: none;">
+            <div class="player-card">
+                <div class="current-grade-image" id="currentGradeImage">
+                    <!-- 최고 등급 이미지가 여기에 표시됩니다 -->
+                </div>
+                <div class="player-info">
+                    <div class="player-name-container">
+                        <h2 id="playerName">선수 이름</h2>
+                        <p class="player-level">레벨 <span id="playerLevel">-</span></p>
+                    </div>
+                </div>
+                <div class="player-characteristics" id="playerCharacteristics">
+                    <div class="characteristics-content">
+                        <div class="characteristic-item">
+                            <span class="characteristic-label">스타일</span>
+                            <span class="characteristic-value" id="playStyle">-</span>
+                        </div>
+                        <div class="characteristic-item">
+                            <span class="characteristic-label">강점</span>
+                            <span class="characteristic-value" id="mainStrength">-</span>
+                        </div>
+                        <div class="characteristic-item">
+                            <span class="characteristic-label">성향</span>
+                            <span class="characteristic-value" id="gameTendency">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 메뉴 -->
+        <div class="tab-container" id="tabContainer" style="display: none;">
+            <div class="tab-menu">
+                <button class="tab-btn active" data-tab="dashboard">
+                    <span class="tab-text">대시보드</span>
+                </button>
+                <button class="tab-btn" data-tab="team">
+                    <span class="tab-text">구단별 데이터</span>
+                </button>
+                <button class="tab-btn" data-tab="stats">
+                    <span class="tab-text">포메이션 분석</span>
+                </button>
+                <button class="tab-btn" data-tab="league" style="display: none;">
+                    <span class="tab-text">리그</span>
+                </button>
+            </div>
+
+            <!-- 대시보드 탭 -->
+            <div class="tab-content active" id="dashboard">
+                <div class="dashboard-compact">
+                    <!-- 최근 경기력 요약 -->
+                    <div class="summary-compact">
+                        <div class="summary-stats">
+                            <div class="summary-item">
+                                <span class="summary-label">승률</span>
+                                <span class="summary-value" id="winRate">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">평균 득점</span>
+                                <span class="summary-value" id="avgGoals">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">평균 실점</span>
+                                <span class="summary-value" id="avgConceded">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">경기력 트렌드</span>
+                                <div class="trend-display" id="trendDisplay">
+                                    <span class="trend-icon"></span>
+                                    <span class="trend-text" id="trendText">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 골 유형 분석 & 주요 선수 카드 -->
+                    <div class="analysis-cards-container">
+                        <!-- 골 유형 분석 카드 -->
+                        <div class="analysis-card goal-analysis-card">
+                            <div class="card-header">
+                                <h3>골 넣는 유형 <span id="goalAnalysisMatchCount" class="match-count">(0)</span></h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="goal-stats">
+                                    <div class="goal-card" id="closeRangeCard">
+                                        <div class="goal-card-icon">⚽</div>
+                                        <div class="goal-card-content">
+                                            <div class="goal-card-label">근거리</div>
+                                            <div class="goal-card-value" id="closeRangePercent">0%</div>
+                                        </div>
+                                        <div class="goal-card-bg"></div>
+                                    </div>
+                                    
+                                    <div class="goal-card" id="midRangeCard">
+                                        <div class="goal-card-icon">🚀</div>
+                                        <div class="goal-card-content">
+                                            <div class="goal-card-label">중거리</div>
+                                            <div class="goal-card-value" id="midRangePercent">0%</div>
+                                        </div>
+                                        <div class="goal-card-bg"></div>
+                                    </div>
+                                    
+                                    <div class="goal-card" id="headingCard">
+                                        <div class="goal-card-icon">💥</div>
+                                        <div class="goal-card-content">
+                                            <div class="goal-card-label">헤딩</div>
+                                            <div class="goal-card-value" id="headingPercent">0%</div>
+                                        </div>
+                                        <div class="goal-card-bg"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 주요 선수 카드 -->
+                        <div class="analysis-card top-players-card">
+                            <div class="card-header">
+                                <h3>주요 선수 <span id="topPlayersMatchCount" class="match-count">(0)</span></h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="top-players-list" id="topPlayersList">
+                                    <!-- 주요 선수들이 여기에 표시됩니다 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 최근 경기 기록 -->
+                    <div class="matches-compact">
+                        <div class="matches-header">
+                            <h3>최근 경기 기록 <span id="matchCount" class="match-count">(0)</span></h3>
+                            <button class="load-more-btn" id="loadMoreBtn">더보기</button>
+                        </div>
+                        <div class="matches-list" id="matchesList">
+                            <!-- 경기 기록이 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <!-- 구단별 데이터 탭 -->
+                <div class="tab-content" id="team">
+                    <div class="team-data-container">
+                        <div class="tab-header-section">
+                            <p class="tab-description">
+                                7명 이상 동일한 선수로 구성된 구단별 경기 분석
+                                <span class="data-info">• 최근 30일 및 100경기 기준</span>
+                            </p>
+                        </div>
+                        
+                        <!-- 최고의 선수 섹션 -->
+                        <div class="top-players-section" id="topPlayersSection" style="display: none;">
+                            <div class="top-players-header">
+                                <h4>🏆 <span id="actualMatchCount">0</span>경기 기준 최고의 선수</h4>
+                                <button class="guide-btn" id="topPlayersGuideBtn" title="지표 가이드">?</button>
+                            </div>
+                            <p class="top-players-subtitle">경기수 대비 활약이 우수한 선수들을 선별했습니다</p>
+                            
+                            <div class="top-players-slider-container">
+                                <button class="slider-nav-btn slider-prev-btn" id="topPlayersPrevBtn" disabled>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="15,18 9,12 15,6"></polyline>
+                                    </svg>
+                                </button>
+                                
+                                <div class="top-players-slider" id="topPlayersSlider">
+                                    <div class="top-players-track" id="topPlayersTrack">
+                                        <!-- 슬라이드들이 여기에 동적으로 생성됩니다 -->
+                                    </div>
+                                </div>
+                                
+                                <button class="slider-nav-btn slider-next-btn" id="topPlayersNextBtn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="9,18 15,12 9,6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="team-data-content" id="teamDataContent">
+                            <div class="loading" id="teamLoading" style="display: none;">
+                                <div class="spinner"></div>
+                                <span>구단별 데이터 분석 중...</span>
+                            </div>
+                            
+                            
+                            <div class="team-layout" id="teamLayout" style="display: none;">
+                                <!-- 클럽 카드 슬라이더 -->
+                                <div class="team-cards-slider-container">
+                                    <button class="slider-nav-btn slider-prev-btn" id="teamSliderPrevBtn" disabled>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="15,18 9,12 15,6"></polyline>
+                                        </svg>
+                                    </button>
+                                    
+                                    <div class="team-cards-slider" id="teamCardsSlider">
+                                        <div class="team-cards-track" id="teamCardsTrack">
+                                            <!-- 동일한 선수들(이름, 시즌, 강화등급)을 사용한 경기 카드들이 여기에 표시됩니다 -->
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="slider-nav-btn slider-next-btn" id="teamSliderNextBtn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9,18 15,12 9,6"></polyline>
+                                        </svg>
+                                    </button>
+                                </div>
+                                
+                                <!-- 선수 데이터 패널 -->
+                                <div class="team-detail-panel" id="teamDetailPanel">
+                                    <div class="team-detail-placeholder">
+                                        <div class="placeholder-icon">⚽</div>
+                                        <h4>구단 카드를 선택하세요</h4>
+                                        <p>위에서 구단 카드를 클릭하면 선수 데이터를 볼 수 있습니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="no-team-data" id="noTeamData" style="display: none;">
+                                <div class="no-data-icon">⚽</div>
+                                <h4>구단별 데이터가 없습니다</h4>
+                                <p>공식경기 100경기 데이터를 먼저 불러와주세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- 포메이션 분석탭 -->
+            <div class="tab-content" id="stats">
+                <div class="formation-data-container">
+                    <div class="tab-header-section">
+                        <p class="tab-description">
+                            사용한 포메이션별 경기 성과 분석
+                            <span class="data-info">• 최근 30일 및 100경기 기준</span>
+                        </p>
+                    </div>
+
+                        <div class="loading" id="formationLoading" style="display: none;">
+                            <div class="spinner"></div>
+                            <span>포메이션 데이터 분석 중...</span>
+                        </div>
+                        
+                        <div class="formation-layout" id="formationLayout" style="display: none;">
+                            <!-- 포메이션별 성과 카드 섹션 -->
+                            <div class="formation-performance-section" id="formationPerformanceSection">
+                                <div class="section-header">
+                                    <h3>📊 포메이션별 경기 성과</h3>
+                                    <p class="section-subtitle">각 포메이션의 전체 성과를 확인하세요</p>
+                                </div>
+                                
+                                <!-- 포메이션 성과 슬라이더 -->
+                                <div class="formation-performance-slider-container">
+                                    <button class="formation-slider-btn" id="formationSliderPrevBtn" disabled>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="15,18 9,12 15,6"></polyline>
+                                        </svg>
+                                    </button>
+                                    
+                                    <div class="formation-performance-slider" id="formationPerformanceSlider">
+                                        <div class="formation-performance-track" id="formationPerformanceTrack">
+                                            <!-- 슬라이드들이 여기에 동적으로 생성됩니다 -->
+                                        </div>
+                                    </div>                                
+                                    <button class="formation-slider-btn" id="formationSliderNextBtn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9,18 15,12 9,6"></polyline>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 동일 포메이션 그룹 카드 섹션 -->
+                            <div class="formation-groups-section" id="formationGroupsSection">
+                                <div class="section-header">                            
+                                    <h3>⚽ 포메이션별 상세 그룹</h3>
+                                    <p class="section-subtitle">동일한 포메이션을 사용한 경기들의 상세 데이터</p>
+                                </div>
+                                <div class="formation-groups-container" id="formationGroupsContainer">
+                                    <!-- 포메이션 그룹 카드들이 여기에 표시됩니다 -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="no-formation-data" id="noFormationData" style="display: none;">
+                            <div class="no-data-icon">⚽</div>
+                            <h4>포메이션 데이터가 없습니다</h4>
+                            <p>공식경기 100경기 데이터를 먼저 불러와주세요.</p>
+                        </div>
+                    
+                </div>
+            </div>
+
+            <!-- 리그 탭 -->
+            <div class="tab-content" id="league">
+                <div class="coming-soon">
+                    <h3>리그</h3>
+                    <p>추후 업데이트 예정입니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 에러 섹션 -->
+        <div class="error-section" id="errorSection" style="display: none;">
+            <div class="error-message" id="errorMessage">
+                <!-- 에러 메시지가 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 특징 가이드 팝업 -->
+    <div class="characteristics-guide-popup-overlay" id="characteristicsGuidePopup" style="display: none;">
+        <div class="characteristics-guide-popup">
+            <div class="popup-header">
+                <h3 id="guideTitle">특징 가이드</h3>
+                <button class="popup-close" id="closeGuideBtn">&times;</button>
+            </div>
+            <div class="popup-content">
+                <div id="guideContent">
+                    <!-- 가이드 내용이 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 최고의 선수 가이드 팝업 -->
+    <div class="top-players-guide-popup-overlay" id="topPlayersGuidePopup" style="display: none;">
+        <div class="top-players-guide-popup">
+            <div class="popup-header">
+                <h3>🏆 최고의 선수 지표 가이드</h3>
+                <button class="popup-close" id="closeTopPlayersGuideBtn">&times;</button>
+            </div>
+            <div class="popup-content">
+                <div class="guide-indicators">
+                    <div class="guide-indicator">
+                        <div class="indicator-header">
+                            <span class="indicator-icon">⭐</span>
+                            <h4>최고 평점</h4>
+                        </div>
+                        <p>경기당 평균 평점이 가장 높은 선수입니다. 전체적인 경기 기여도를 종합적으로 평가합니다.</p>
+                    </div>
+                    
+                    <div class="guide-indicator">
+                        <div class="indicator-header">
+                            <span class="indicator-icon">⚽</span>
+                            <h4>최다 득점</h4>
+                        </div>
+                        <p>가장 많은 골을 넣은 선수입니다. 공격력과 득점 능력을 보여줍니다.</p>
+                    </div>
+                    
+                    <div class="guide-indicator">
+                        <div class="indicator-header">
+                            <span class="indicator-icon">🅰️</span>
+                            <h4>최다 도움</h4>
+                        </div>
+                        <p>가장 많은 어시스트를 기록한 선수입니다. 플레이메이킹과 팀워크 능력을 보여줍니다.</p>
+                    </div>
+                    
+                    <div class="guide-indicator">
+                        <div class="indicator-header">
+                            <span class="indicator-icon">🛡️</span>
+                            <h4>수비 성공</h4>
+                        </div>
+                        <p>블록, 태클, 인터셉트를 합친 수비 성공률이 가장 높은 선수입니다. 수비 기여도를 보여줍니다.</p>
+                    </div>
+                    
+                    <div class="guide-indicator">
+                        <div class="indicator-header">
+                            <span class="indicator-icon">🏆</span>
+                            <h4>멀티 기여도</h4>
+                        </div>
+                        <p>경기당 (골 + 어시스트 + 블록 + 태클 + 인터셉트) / 경기수로 계산됩니다. 올라운드 플레이어를 평가합니다.</p>
+                    </div>
+                    
+                    <div class="guide-indicator">
+                        <div class="indicator-header">
+                            <span class="indicator-icon">🎯</span>
+                            <h4>득점 성공률</h4>
+                        </div>
+                        <p>(총 골 수 / 총 슛 수) × 100으로 계산됩니다. 슈팅 정확도를 보여줍니다.</p>
+                    </div>
+                    
+                    <div class="guide-indicator">
+                        <div class="indicator-header">
+                            <span class="indicator-icon">📊</span>
+                            <h4>도움 성공률</h4>
+                        </div>
+                        <p>(어시스트 수 / 패스 시도 수) × 100으로 계산됩니다. 패스 정확도를 보여줍니다.</p>
+                    </div>
+                    
+                    <div class="guide-indicator">
+                        <div class="indicator-header">
+                            <span class="indicator-icon">💥</span>
+                            <h4>공중볼 성공률</h4>
+                        </div>
+                        <p>(공중볼 성공 수 / 공중볼 시도 수) × 100으로 계산됩니다. 헤딩과 공중볼 경합 능력을 보여줍니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 계산 과정 팝업 -->
+    <div class="calculation-popup-overlay" id="calculationPopup" style="display: none;">
+        <div class="calculation-popup">
+            <div class="popup-header">
+                <h3>📊 계산 과정</h3>
+                <button class="popup-close" onclick="closeCalculationPopup()">&times;</button>
+            </div>
+            <div class="popup-content">
+                <div id="calculationPopupContent">
+                    <!-- 계산 과정 내용이 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem 1rem; margin-top: 3rem; color: #666; font-size: 0.875rem;">
+        Data based on NEXON Open API
+    </footer>
+
+    <!-- Common JavaScript -->
+    <script src="js/common.js"></script>
+    <!-- Dashboard JavaScript -->
+    <script src="js/dashboard.js"></script>
+    <!-- Team Data JavaScript -->
+    <script src="js/team.js"></script>
+    <!-- Formation Analysis JavaScript -->
+    <script src="js/formation.js"></script>
+</body>
+</html>
+
