@@ -1,5 +1,5 @@
-﻿// API 설정
-const API_KEY = 'live_72e6c00482ffc1def6dde5f00b426e8d07b3d0335525104d8d9b7fe6b1a579a2efe8d04e6d233bd35cf2fabdeb93fb0d';
+﻿// API 설정 - 서버를 통해 처리하므로 프론트엔드에서는 불필요
+// const API_KEY는 보안상 제거됨 - 서버(.env)에서 관리
 const BASE_URL = 'https://open.api.nexon.com/fconline/v1';
 
 // 넥슨 API의 실제 엔드포인트들 (문서 기반)
@@ -278,44 +278,8 @@ async function searchUser() {
     }
 }
 
-// 간단한 API 테스트 함수
-async function testNexonAPI() {
-    
-    // 테스트용 닉네임 (실제 존재하는 닉네임으로 변경 필요)
-    const testNickname = 'test';
-    
-    // 가장 일반적인 넥슨 API 형식 시도
-    const testUrl = `${NEXON_ENDPOINTS.userBasic}?nickname=${encodeURIComponent(testNickname)}`;
-    const testHeaders = {
-        'x-nxopen-api-key': API_KEY,
-        'Content-Type': 'application/json'
-    };
-    
-    try {
-        
-        const response = await fetch(testUrl, {
-            method: 'GET',
-            headers: testHeaders
-        });
-        
-        
-        const responseText = await response.text();
-        
-        if (response.ok) {
-            try {
-                const data = JSON.parse(responseText);
-                return data;
-            } catch (e) {
-                return responseText;
-            }
-        } else {
-            return null;
-        }
-        
-    } catch (error) {
-        return null;
-    }
-}
+// API 테스트 함수는 서버를 통해 처리하므로 제거됨
+// 모든 API 호출은 /api/* 엔드포인트를 통해 서버에서 안전하게 처리됩니다
 
 // 닉네임으로 accessId 조회 (서버를 통해)
 async function getAccessIdByNickname(nickname) {

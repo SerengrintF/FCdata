@@ -20,3 +20,6 @@ Thumbs.db
 # Analytics Data
 data/
 
+# Test files
+test-*.html
+
