@@ -14,7 +14,24 @@
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <meta name="viewport" content="width=1200, initial-scale=0.5, user-scalable=yes">
-    <title>FC온라인 분석 도구</title>
+    <title>FC Data - FC온라인 전적 분석 | 구단별 포메이션 통계</title>
+    
+    <!-- SEO 최적화 -->
+    <meta name="description" content="FC온라인 전적 분석 사이트. 닉네임 검색으로 최근 100경기 데이터, 구단별 성과, 포메이션 분석을 무료로 확인하세요. 로그인 불필요.">
+    <meta name="keywords" content="FC온라인, 피파온라인, 전적검색, 전적분석, 구단분석, 포메이션분석, FC Online, 넥슨">
+    <meta name="author" content="FC Data">
+    
+    <!-- Open Graph (SNS 공유용) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="FC Data - FC온라인 전적 분석">
+    <meta property="og:description" content="닉네임 검색으로 FC온라인 경기 데이터를 분석하세요. 구단별 성과, 포메이션 분석, 선수 통계 제공.">
+    <meta property="og:url" content="https://fc-data.kr">
+    <meta property="og:image" content="https://fc-data.kr/logo.svg">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FC Data - FC온라인 전적 분석">
+    <meta name="twitter:description" content="FC온라인 경기 데이터 분석 및 통계">
     <!-- Common Styles -->
     <link rel="stylesheet" href="css/common.css">
     <!-- Dashboard Styles -->
@@ -514,6 +531,22 @@
             <polyline points="18 15 12 9 6 15"></polyline>
         </svg>
     </button>
+
+    <!-- 구조화된 데이터 (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "FC Data",
+      "url": "https://fc-data.kr",
+      "description": "FC온라인 전적 분석 도구",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://fc-data.kr/?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 
     <!-- Common JavaScript -->
     <script src="js/common.js"></script>
