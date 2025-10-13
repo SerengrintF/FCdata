@@ -1160,6 +1160,15 @@ async function loadMoreMatches() {
         return;
     }
     
+    // Google Analytics 더보기 클릭 이벤트 추적
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'load_more', {
+            'event_category': 'user_interaction',
+            'event_label': 'Dashboard Load More Matches',
+            'current_match_count': dashboardMatches.length
+        });
+    }
+    
     // 대시보드 경기 수 확인
     
     // 100경기 제한 확인

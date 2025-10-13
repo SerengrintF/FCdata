@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TMBJCM9Z');</script>
-    <!-- End Google Tag Manager -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0E8XPDGDXL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-0E8XPDGDXL');
+    </script>
     
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
@@ -505,6 +507,13 @@
     <footer style="text-align: center; padding: 2rem 1rem; margin-top: 3rem; color: #666; font-size: 0.875rem;">
         Data based on NEXON Open API
     </footer>
+
+    <!-- 맨 위로 가기 버튼 -->
+    <button id="scrollToTopBtn" class="scroll-to-top" aria-label="맨 위로 가기">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
 
     <!-- Common JavaScript -->
     <script src="js/common.js"></script>

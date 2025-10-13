@@ -165,6 +165,20 @@ tabBtns.forEach(btn => {
     });
 });
 
+// YouTube 버튼 클릭 추적
+const youtubeBtn = document.getElementById('followBtn');
+if (youtubeBtn) {
+    youtubeBtn.addEventListener('click', () => {
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'click', {
+                'event_category': 'engagement',
+                'event_label': 'YouTube Channel Link',
+                'value': 'External Link'
+            });
+        }
+    });
+}
+
 
 // 유저 검색 함수 (서버에서 한 번에 처리)
 async function searchUser() {
@@ -207,11 +221,6 @@ async function searchUser() {
         
         const userInfo = await response.json();
         
-        console.log('[프론트엔드] 서버 응답 데이터:', {
-            isAdmin: userInfo.isAdmin,
-            hasAdminDashboard: !!userInfo.adminDashboard,
-            nickname: userInfo.nickname
-        });
         
         // 관리자 대시보드 확인
         if (userInfo.isAdmin && userInfo.adminDashboard) {
@@ -256,6 +265,14 @@ async function searchUser() {
                 
                 // 검색 기록에 추가
                 addToSearchHistory(nickname);
+                
+                // Google Analytics 검색 이벤트 추적
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'search', {
+                        'search_term': nickname,
+                        'event_category': 'user_interaction'
+                    });
+                }
                 
                 displayPlayerInfo(userInfo, nickname);
                 showDashboard(userInfo);
@@ -524,6 +541,15 @@ function showDashboard(userInfo) {
 
 // 탭 전환 함수
 function switchTab(tabId) {
+    // Google Analytics 탭 추적
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'tab_view', {
+            'tab_name': tabId,
+            'event_category': 'engagement',
+            'event_label': `Tab: ${tabId}`
+        });
+    }
+    
     // 모든 탭 버튼 비활성화
     tabBtns.forEach(btn => btn.classList.remove('active'));
     tabContents.forEach(content => content.classList.remove('active'));
@@ -752,4 +778,39 @@ function displayAdminDashboard(stats) {
 }
 
 // 대시보드 데이터 로드
+
+// ============================================
+// 맨 위로 가기 버튼
+// ============================================
+const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+if (scrollToTopBtn) {
+    // 스크롤 이벤트 감지
+    window.addEventListener('scroll', () => {
+        // 300px 이상 스크롤하면 버튼 표시
+        if (window.scrollY > 300) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
+        }
+    });
+
+    // 버튼 클릭 시 맨 위로 스크롤
+    scrollToTopBtn.addEventListener('click', () => {
+        // Google Analytics 이벤트 추적
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'scroll_to_top', {
+                'event_category': 'user_interaction',
+                'event_label': 'Scroll to Top Button',
+                'scroll_depth': window.scrollY
+            });
+        }
+        
+        // 부드럽게 맨 위로 스크롤
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
 
