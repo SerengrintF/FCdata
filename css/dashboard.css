@@ -2724,10 +2724,10 @@
 .grade-9 { background: linear-gradient(135deg, #FFA500, #FF8C00); }
 .grade-10 { background: linear-gradient(135deg, #FF8C00, #FF7F00); }
 
-/* 백금색 계열 (11-13) */
-.grade-11 { background: linear-gradient(135deg, #E5E4E2, #BCC6CC); }
-.grade-12 { background: linear-gradient(135deg, #BCC6CC, #98AFC7); }
-.grade-13 { background: linear-gradient(135deg, #98AFC7, #708090); }
+/* 백금색 계열 (11-13) - 부드러운 황금-무지개-사파이어 그라디언트 */
+.grade-11 { background: linear-gradient(135deg, rgba(255, 215, 0, 0.8), rgba(255, 165, 0, 0.7), rgba(230, 230, 250, 0.6), rgba(176, 196, 222, 0.7)); }
+.grade-12 { background: linear-gradient(135deg, rgba(255, 165, 0, 0.7), rgba(255, 140, 0, 0.6), rgba(240, 230, 140, 0.5), rgba(135, 206, 235, 0.6), rgba(70, 130, 180, 0.7)); }
+.grade-13 { background: linear-gradient(135deg, rgba(255, 140, 0, 0.6), rgba(255, 127, 80, 0.5), rgba(221, 160, 221, 0.4), rgba(135, 206, 235, 0.5), rgba(65, 105, 225, 0.6), rgba(25, 25, 112, 0.7)); }
 
 /* 호버 효과 */
 .grade-badge:hover {
@@ -2743,18 +2743,32 @@
 }
 
 .grade-11, .grade-12, .grade-13 {
-    box-shadow: 0 0 8px rgba(229, 228, 226, 0.4);
-    border: 1px solid rgba(229, 228, 226, 0.3);
-    background: linear-gradient(135deg, #E5E4E2, #BCC6CC, #98AFC7);
-    animation: platinum-glow 2s ease-in-out infinite alternate;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.3), 0 0 4px rgba(135, 206, 235, 0.2);
+    border: 1px solid rgba(255, 165, 0, 0.3);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.8), rgba(255, 165, 0, 0.7), rgba(230, 230, 250, 0.6), rgba(135, 206, 235, 0.5), rgba(65, 105, 225, 0.6));
+    animation: iridescent-glow 4s ease-in-out infinite alternate;
 }
 
-@keyframes platinum-glow {
-    from {
-        box-shadow: 0 0 8px rgba(229, 228, 226, 0.4);
+@keyframes iridescent-glow {
+    0% {
+        box-shadow: 0 0 8px rgba(255, 215, 0, 0.3), 0 0 4px rgba(135, 206, 235, 0.2);
+        filter: hue-rotate(0deg) brightness(1.1);
     }
-    to {
-        box-shadow: 0 0 12px rgba(229, 228, 226, 0.6);
+    25% {
+        box-shadow: 0 0 10px rgba(255, 165, 0, 0.4), 0 0 6px rgba(221, 160, 221, 0.3);
+        filter: hue-rotate(90deg) brightness(1.05);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(135, 206, 235, 0.5), 0 0 8px rgba(65, 105, 225, 0.4);
+        filter: hue-rotate(180deg) brightness(1.0);
+    }
+    75% {
+        box-shadow: 0 0 10px rgba(65, 105, 225, 0.4), 0 0 6px rgba(25, 25, 112, 0.3);
+        filter: hue-rotate(270deg) brightness(1.05);
+    }
+    100% {
+        box-shadow: 0 0 8px rgba(255, 215, 0, 0.3), 0 0 4px rgba(135, 206, 235, 0.2);
+        filter: hue-rotate(360deg) brightness(1.1);
     }
 }
 

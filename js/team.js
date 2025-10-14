@@ -41,9 +41,9 @@ function getGradeInfo(grade) {
         8: { name: '+8', color: '#FFD700', tier: 'gold' },
         9: { name: '+9', color: '#FFA500', tier: 'gold' },
         10: { name: '+10', color: '#FF8C00', tier: 'gold' },
-        11: { name: '+11', color: '#E5E4E2', tier: 'platinum' },
-        12: { name: '+12', color: '#BCC6CC', tier: 'platinum' },
-        13: { name: '+13', color: '#98AFC7', tier: 'platinum' }
+        11: { name: '+11', color: 'rgba(255, 215, 0, 0.8)', tier: 'iridescent' },
+        12: { name: '+12', color: 'rgba(135, 206, 235, 0.6)', tier: 'iridescent' },
+        13: { name: '+13', color: 'rgba(65, 105, 225, 0.6)', tier: 'iridescent' }
     };
     
     return gradeMap[grade] || { name: `+${grade}`, color: '#6B7280', tier: 'basic' };
@@ -52,7 +52,12 @@ function getGradeInfo(grade) {
 // 강화 등급 배지 렌더링 함수
 function renderGradeBadge(grade) {
     const gradeInfo = getGradeInfo(grade);
-    return `<div class="player-grade-badge grade-${grade}" style="background: ${gradeInfo.color}; color: white; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">+${grade}</div>`;
+    // +11~+13 등급은 CSS 그라디언트 클래스 사용, 나머지는 기존 방식
+    if (grade >= 11) {
+        return `<div class="player-grade-badge grade-${grade}">+${grade}</div>`;
+    } else {
+        return `<div class="player-grade-badge grade-${grade}" style="background: ${gradeInfo.color}; color: white; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">+${grade}</div>`;
+    }
 }
 
 // 포메이션 분석 관련 요소들

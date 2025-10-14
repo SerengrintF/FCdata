@@ -91,23 +91,148 @@ let searchHistory = JSON.parse(localStorage.getItem('fcData_searchHistory') || '
 let favorites = JSON.parse(localStorage.getItem('fcData_favorites') || '[]');
 let selectedIndex = -1;
 
-// 경기 수 업데이트 함수
+// 이메일 팝업 관련 요소들
+const emailBtn = document.getElementById('emailBtn');
+const emailPopup = document.getElementById('emailPopup');
+const closeEmailBtn = document.getElementById('closeEmailBtn');
+const copyEmailBtn = document.getElementById('copyEmailBtn');
+
+// 경기 수 업데이트 함수 (대시보드 전용)
 function updateMatchCount() {
-    const matchItems = document.querySelectorAll('.match-item');
+    // 대시보드 탭 내부의 match-item만 선택
+    const dashboardMatchesList = document.getElementById('matchesList');
+    const matchItems = dashboardMatchesList ? dashboardMatchesList.querySelectorAll('.match-item') : [];
     const count = matchItems.length;
-    matchCount.textContent = `(${count})`;
+    matchCount.textContent = `(${count}경기)`;
     
     // 골 넣는 유형과 주요 선수 카드의 경기 수도 업데이트
     const goalAnalysisMatchCount = document.getElementById('goalAnalysisMatchCount');
     const topPlayersMatchCount = document.getElementById('topPlayersMatchCount');
     
     if (goalAnalysisMatchCount) {
-        goalAnalysisMatchCount.textContent = `(${count})`;
+        goalAnalysisMatchCount.textContent = `(${count}경기)`;
     }
     if (topPlayersMatchCount) {
-        topPlayersMatchCount.textContent = `(${count})`;
+        topPlayersMatchCount.textContent = `(${count}경기)`;
     }
 }
+
+// 이메일 팝업 열기
+function openEmailPopup() {
+    if (emailPopup) {
+        emailPopup.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+// 이메일 팝업 닫기
+function closeEmailPopup() {
+    if (emailPopup) {
+        emailPopup.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// 이메일 복사 기능
+function copyEmailToClipboard() {
+    const email = 'serengrinf@gmail.com';
+    
+    if (navigator.clipboard && window.isSecureContext) {
+        // 최신 브라우저의 Clipboard API 사용
+        navigator.clipboard.writeText(email).then(() => {
+            showCopySuccess();
+        }).catch(() => {
+            fallbackCopyTextToClipboard(email);
+        });
+    } else {
+        // 구형 브라우저를 위한 fallback
+        fallbackCopyTextToClipboard(email);
+    }
+}
+
+// 구형 브라우저용 복사 함수
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showCopySuccess();
+        } else {
+            showCopyError();
+        }
+    } catch (err) {
+        showCopyError();
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// 복사 성공 메시지
+function showCopySuccess() {
+    const originalText = copyEmailBtn.textContent;
+    copyEmailBtn.textContent = '복사됨!';
+    copyEmailBtn.style.background = '#28a745';
+    
+    setTimeout(() => {
+        copyEmailBtn.textContent = originalText;
+        copyEmailBtn.style.background = '';
+    }, 2000);
+}
+
+// 복사 실패 메시지
+function showCopyError() {
+    const originalText = copyEmailBtn.textContent;
+    copyEmailBtn.textContent = '복사 실패';
+    copyEmailBtn.style.background = '#dc3545';
+    
+    setTimeout(() => {
+        copyEmailBtn.textContent = originalText;
+        copyEmailBtn.style.background = '';
+    }, 2000);
+}
+
+
+// 이메일 팝업 이벤트 리스너 등록
+document.addEventListener('DOMContentLoaded', function() {
+    // 이메일 버튼 클릭 이벤트
+    if (emailBtn) {
+        emailBtn.addEventListener('click', openEmailPopup);
+    }
+    
+    // 팝업 닫기 버튼 이벤트
+    if (closeEmailBtn) {
+        closeEmailBtn.addEventListener('click', closeEmailPopup);
+    }
+    
+    // 이메일 복사 버튼 이벤트
+    if (copyEmailBtn) {
+        copyEmailBtn.addEventListener('click', copyEmailToClipboard);
+    }
+    
+    // 팝업 배경 클릭 시 닫기
+    if (emailPopup) {
+        emailPopup.addEventListener('click', function(e) {
+            if (e.target === emailPopup) {
+                closeEmailPopup();
+            }
+        });
+    }
+    
+    // ESC 키로 팝업 닫기
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && emailPopup && emailPopup.style.display === 'flex') {
+            closeEmailPopup();
+        }
+    });
+});
 
 // 경기 통계 업데이트 (더보기로 경기 추가 시 호출)
 function updateMatchStatistics() {
@@ -249,6 +374,17 @@ async function searchUser() {
                 // 포메이션 데이터 캐시 초기화 (새로운 사용자 검색 시)
                 formationDataCache = null;
                 formationDataLoaded = false;
+                
+                // 라이벌 매치 데이터 초기화 (새로운 사용자 검색 시)
+                if (typeof rivalMatchManager !== 'undefined') {
+                    const rivalContainer = document.getElementById('rival-container');
+                    if (rivalContainer) {
+                        rivalContainer.innerHTML = '';
+                    }
+                    rivalMatchManager.rivalMatches = [];
+                    rivalMatchManager.rivalNickname = null;
+                    rivalMatchManager.rivalOffset = 10;
+                }
                 
                 // teamDetailPanel 초기화
                 const teamDetailPanel = document.getElementById('teamDetailPanel');

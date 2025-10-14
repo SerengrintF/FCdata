@@ -835,10 +835,15 @@ function generateQuickSummary(stats, matches, analysis) {
         if (formationMatch && formationMatch[1]) {
             const recommendedFormation = formationMatch[1];
             const winRateMatch = counterFormationFeedback.match(/승률이.*?(\d+)%p/);
-            if (winRateMatch) {
-                action = `${recommendedFormation}으로 변경하면 승률이 ${winRateMatch[1]}%p 더 높아집니다`;
+            const currentWinRateMatch = counterFormationFeedback.match(/현재\s+(\d+)%/);
+            const bestWinRateMatch = counterFormationFeedback.match(/→\s+(\d+)%/);
+            
+            if (winRateMatch && currentWinRateMatch && bestWinRateMatch) {
+                action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경하면 승률이 ${winRateMatch[1]}%p 더 높아집니다 (현재 ${currentWinRateMatch[1]}% → ${bestWinRateMatch[1]}%)`;
+            } else if (winRateMatch) {
+                action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경하면 승률이 ${winRateMatch[1]}%p 더 높아집니다`;
             } else {
-                action = `${recommendedFormation} 포메이션으로 변경을 고려해보세요`;
+                action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경을 고려해보세요`;
             }
         }
     } else if (winRate < 40) {
@@ -990,7 +995,13 @@ function analyzeCounterFormation(opponentFormation, matches, feedback) {
                 
                 if (winRateDiff > 15) {
                     feedback.push(
-                        `🔄 전술 변경 추천: ${best.formation} 사용 시 승률이 <strong>${winRateDiff.toFixed(0)}%p 더 높습니다</strong>`
+                        `🔄 <strong>${best.formation}</strong> 포메이션으로 변경하면 승률이 <strong>${winRateDiff.toFixed(0)}%p 더 높아집니다</strong> ` +
+                        `(현재 ${current.winRate.toFixed(0)}% → ${best.winRate.toFixed(0)}%)`
+                    );
+                } else if (winRateDiff > 10) {
+                    feedback.push(
+                        `💡 <strong>${best.formation}</strong> 포메이션을 고려해보세요. ` +
+                        `승률이 ${winRateDiff.toFixed(0)}%p 더 높습니다 (현재 ${current.winRate.toFixed(0)}% → ${best.winRate.toFixed(0)}%)`
                     );
                 }
             } else if (best.formation === current.formation) {
@@ -1002,7 +1013,7 @@ function analyzeCounterFormation(opponentFormation, matches, feedback) {
         } else if (!current && best) {
             // 현재 포메이션으로는 이 상대를 만난 적이 없는 경우
             feedback.push(
-                `💡 참고: <strong>${best.formation}</strong> 포메이션이 ` +
+                `💡 <strong>${best.formation}</strong> 포메이션을 시도해보세요. ` +
                 `상대 ${opponentFormation}에 대해 가장 좋은 성적을 기록했습니다 ` +
                 `(승률 ${best.winRate.toFixed(0)}%, ${best.matchCount}경기)`
             );

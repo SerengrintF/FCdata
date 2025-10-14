@@ -236,6 +236,178 @@ body.modal-open {
     transform: scale(1.1);
 }
 
+/* 이메일 버튼 스타일 - 세로 레이아웃 */
+.email-btn {
+    background: #000000;
+    border-color: #000000;
+    color: white;
+    padding: 8px 12px;
+    min-width: auto;
+    height: auto;
+}
+
+.email-btn:hover {
+    background: #ffffff;
+    border-color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.email-btn-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.email-icon {
+    font-size: 18px;
+    transition: all var(--transition-fast);
+    line-height: 1;
+}
+
+.email-text {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    transition: all var(--transition-fast);
+}
+
+.email-btn:hover .email-icon {
+    transform: scale(1.1);
+}
+
+.email-btn:hover .email-text {
+    color: #000000;
+}
+
+/* 이메일 팝업 스타일 */
+.email-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+}
+
+.email-popup {
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    animation: popupSlideIn 0.3s ease-out;
+}
+
+.email-popup .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.email-popup .popup-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.email-popup .popup-content {
+    padding: 24px;
+}
+
+.email-info {
+    text-align: center;
+}
+
+.email-address {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.email-label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.email-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-accent);
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+}
+
+.email-description {
+    margin-bottom: 24px;
+}
+
+.email-description p {
+    margin: 0 0 8px 0;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.email-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.copy-email-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background: var(--bg-accent);
+    color: white;
+    min-width: 140px;
+}
+
+.copy-email-btn:hover {
+    background: var(--bg-accent-hover);
+    transform: translateY(-1px);
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+    .email-popup {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .email-popup .popup-header {
+        padding: 16px 20px;
+    }
+    
+    .email-popup .popup-content {
+        padding: 20px;
+    }
+    
+    .copy-email-btn {
+        width: 100%;
+    }
+}
+
 
 /* 검색 섹션 - 현대적 카드 디자인 */
 .search-section {
@@ -1007,7 +1179,7 @@ body.modal-open {
 .current-grade-image.grade-10 { border-color: #FFD700; }
 .current-grade-image.grade-11,
 .current-grade-image.grade-12,
-.current-grade-image.grade-13 { border-color: #E5E4E2; }
+.current-grade-image.grade-13 { border-color: rgba(65, 105, 225, 0.6); }
 
 .highest-grade-image.grade-0 { border-color: #6B7280; }
 .highest-grade-image.grade-1,
@@ -1022,7 +1194,7 @@ body.modal-open {
 .highest-grade-image.grade-10 { border-color: #FFD700; }
 .highest-grade-image.grade-11,
 .highest-grade-image.grade-12,
-.highest-grade-image.grade-13 { border-color: #E5E4E2; }
+.highest-grade-image.grade-13 { border-color: rgba(65, 105, 225, 0.6); }
 
 /* 탭 메뉴 - FotMob 스타일 */
 .tab-container {

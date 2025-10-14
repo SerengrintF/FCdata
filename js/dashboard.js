@@ -1049,8 +1049,10 @@ function displayRealMatches(matches) {
         const conceded = match.opponentGoals || 0;
         const score = `${goals} - ${conceded}`;
         
-        // 상대방 닉네임 표시
+        // 상대방 닉네임 표시 (컨트롤러 정보 포함)
         const opponentName = match.opponentNickname || '상대방';
+        const opponentControllerEmoji = getControllerEmoji(match.opponentController);
+        const opponentDisplayName = `${opponentName} ${opponentControllerEmoji}`;
         
         // 날짜 포맷팅
         const matchDate = match.matchDate ? formatMatchDate(match.matchDate) : '';
@@ -1068,7 +1070,7 @@ function displayRealMatches(matches) {
                 <div class="match-info">
                     <div class="match-details">
                         <span class="match-date">${matchDate}</span>
-                        <span class="match-opponent">vs <span class="opponent-nickname-clickable" onclick="searchOpponent(event, '${opponentName}')">${opponentName}</span></span>
+                        <span class="match-opponent">vs <span class="opponent-nickname-clickable" onclick="searchOpponent(event, '${opponentName}')">${opponentDisplayName}</span></span>
                         <div class="match-badges">
                             ${highlightHtml}
                             ${mvpHtml}
@@ -1279,8 +1281,10 @@ function displayMoreMatches(moreMatches) {
         const conceded = match.opponentGoals || 0;
         const score = `${goals} - ${conceded}`;
         
-        // 상대방 닉네임 표시
+        // 상대방 닉네임 표시 (컨트롤러 정보 포함)
         const opponentName = match.opponentNickname || '상대방';
+        const opponentControllerEmoji = getControllerEmoji(match.opponentController);
+        const opponentDisplayName = `${opponentName} ${opponentControllerEmoji}`;
         
         // 날짜 포맷팅
         const matchDate = match.matchDate ? formatMatchDate(match.matchDate) : '';
@@ -1298,7 +1302,7 @@ function displayMoreMatches(moreMatches) {
                 <div class="match-info">
                     <div class="match-details">
                         <span class="match-date">${matchDate}</span>
-                        <span class="match-opponent">vs <span class="opponent-nickname-clickable" onclick="searchOpponent(event, '${opponentName}')">${opponentName}</span></span>
+                        <span class="match-opponent">vs <span class="opponent-nickname-clickable" onclick="searchOpponent(event, '${opponentName}')">${opponentDisplayName}</span></span>
                         <div class="match-badges">
                             ${highlightHtml}
                             ${mvpHtml}
@@ -2384,9 +2388,9 @@ function getGradeInfo(grade) {
         8: { name: '+8', color: '#FFD700', tier: 'gold' },
         9: { name: '+9', color: '#FFA500', tier: 'gold' },
         10: { name: '+10', color: '#FF8C00', tier: 'gold' },
-        11: { name: '+11', color: '#E5E4E2', tier: 'platinum' },
-        12: { name: '+12', color: '#BCC6CC', tier: 'platinum' },
-        13: { name: '+13', color: '#98AFC7', tier: 'platinum' }
+        11: { name: '+11', color: 'rgba(255, 215, 0, 0.8)', tier: 'iridescent' },
+        12: { name: '+12', color: 'rgba(135, 206, 235, 0.6)', tier: 'iridescent' },
+        13: { name: '+13', color: 'rgba(65, 105, 225, 0.6)', tier: 'iridescent' }
     };
     
     return gradeMap[grade] || { name: `+${grade}`, color: '#6B7280', tier: 'basic' };
@@ -2883,7 +2887,7 @@ function getFormationBasedCharacteristic(formation) {
         '3-5-2': '🎪 윙백 활용',
         '4-5-1': '🛡️ 미드필드 장악',
         '5-3-2': '🏰 수비 중시',
-        '4-2-2-1-1': '⚡ FC온라인 전술'
+        '4-2-2-1-1': '⚡ 균형 잡힌 플레이'
     };
     return formationMap[formation] || '⚖️ 균형 잡힌 플레이';
 }
@@ -3096,11 +3100,6 @@ function getTacticsGuide() {
             description: '5-3-2 포메이션으로 수비 안정성을 최우선으로 하는 전술',
             features: '견고한 수비라인, 수비 안정성, 세트피스 대응, 역습 기회'
         },
-        fc_online_tactics: {
-            name: 'FC온라인 전술',
-            description: 'FC온라인에 특화된 4-2-2-1-1 포메이션 전술',
-            features: 'CAM 활용, 중거리 슈팅, 패스 플레이, 게임 특화 전술'
-        }
     };
 }
 
@@ -3943,6 +3942,17 @@ function resetToHomePage() {
     // 전역 변수 초기화
     currentUserInfo = null;
     currentMatchOffset = 10;
+    
+    // 라이벌 매치 데이터 초기화
+    if (typeof rivalMatchManager !== 'undefined') {
+        const rivalContainer = document.getElementById('rival-container');
+        if (rivalContainer) {
+            rivalContainer.innerHTML = '';
+        }
+        rivalMatchManager.rivalMatches = [];
+        rivalMatchManager.rivalNickname = null;
+        rivalMatchManager.rivalOffset = 10;
+    }
     
     // 로딩 상태 해제
     loading.style.display = 'none';

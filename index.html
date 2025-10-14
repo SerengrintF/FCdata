@@ -40,6 +40,8 @@
     <link rel="stylesheet" href="css/team.css">
     <!-- Formation Analysis Styles -->
     <link rel="stylesheet" href="css/formation.css">
+    <!-- Rival Match Styles -->
+    <link rel="stylesheet" href="css/rival.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -65,6 +67,12 @@
                         </svg>
                         <span>Youtube</span>
                     </a>
+                    <button class="action-btn secondary email-btn" id="emailBtn" title="문의 및 피드백">
+                        <div class="email-btn-content">
+                            <span class="email-icon">📧</span>
+                            <span class="email-text">문의</span>
+                        </div>
+                    </button>
                 </div>
             </div>
         </header>
@@ -146,8 +154,8 @@
                 <button class="tab-btn" data-tab="stats">
                     <span class="tab-text">포메이션 분석</span>
                 </button>
-                <button class="tab-btn" data-tab="league" style="display: none;">
-                    <span class="tab-text">리그</span>
+                <button class="tab-btn" data-tab="rival">
+                    <span class="tab-text">라이벌 매치</span>
                 </button>
             </div>
 
@@ -396,12 +404,9 @@
                 </div>
             </div>
 
-            <!-- 리그 탭 -->
-            <div class="tab-content" id="league">
-                <div class="coming-soon">
-                    <h3>리그</h3>
-                    <p>추후 업데이트 예정입니다.</p>
-                </div>
+            <!-- 라이벌 매치 탭 -->
+            <div class="tab-content" id="rival">
+                <div id="rival-container"></div>
             </div>
         </div>
 
@@ -520,6 +525,31 @@
         </div>
     </div>
 
+    <!-- 이메일 문의 팝업 -->
+    <div class="email-popup-overlay" id="emailPopup" style="display: none;">
+        <div class="email-popup">
+            <div class="popup-header">
+                <h3>📧 문의 및 피드백</h3>
+                <button class="popup-close" id="closeEmailBtn">&times;</button>
+            </div>
+            <div class="popup-content">
+                <div class="email-info">
+                    <div class="email-address">
+                        <span class="email-label">이메일 주소:</span>
+                        <span class="email-value">serengrinf@gmail.com</span>
+                    </div>
+                    <div class="email-description">
+                        <p>문의사항이나 피드백이 있으시면 언제든지 연락주세요!</p>
+                        <p>빠른 시일 내에 답변드리겠습니다.</p>
+                    </div>
+                    <div class="email-actions">
+                        <button class="copy-email-btn" id="copyEmailBtn">이메일 복사</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer style="text-align: center; padding: 2rem 1rem; margin-top: 3rem; color: #666; font-size: 0.875rem;">
         Data based on NEXON Open API
@@ -556,6 +586,8 @@
     <script src="js/team.js"></script>
     <!-- Formation Analysis JavaScript -->
     <script src="js/formation.js"></script>
+    <!-- Rival Match JavaScript -->
+    <script src="js/rival.js"></script>
 </body>
 </html>
 

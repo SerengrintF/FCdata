@@ -1,0 +1,279 @@
+/* ========================================
+   리그 탭 전용 스타일
+   ======================================== */
+
+/* 리그 컨테이너 */
+#league-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 로딩 컨테이너 */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 20px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--bg-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 에러 컨테이너 */
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.error-icon {
+    font-size: 48px;
+}
+
+.error-message {
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+/* 리그 콘텐츠 */
+.league-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 리그 헤더 */
+.league-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.league-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.league-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* 내 순위 카드 */
+.my-rank-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rank-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.rank-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.division-badge {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(255, 165, 0, 0.3);
+}
+
+/* 순위 콘텐츠 */
+.rank-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.rank-main {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.rank-number {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--bg-accent);
+    line-height: 1;
+}
+
+.rank-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.total-players {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.percentile {
+    color: var(--text-accent);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* 순위 통계 */
+.rank-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.stat-item.highlight {
+    background: var(--bg-accent);
+    border-color: var(--bg-accent);
+}
+
+.stat-item.highlight .stat-label,
+.stat-item.highlight .stat-value {
+    color: white;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.stat-value.win {
+    color: #28a745;
+}
+
+.stat-value.draw {
+    color: #6c757d;
+}
+
+.stat-value.lose {
+    color: #dc3545;
+}
+
+/* 준비중 섹션 */
+.coming-soon-section {
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 40px 24px;
+    text-align: center;
+}
+
+.coming-soon-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.coming-soon-section h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.coming-soon-section p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+    text-align: left;
+}
+
+.feature-list li {
+    padding: 8px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+    #league-container {
+        padding: 16px;
+    }
+
+    .league-header h2 {
+        font-size: 24px;
+    }
+
+    .my-rank-card {
+        padding: 20px;
+    }
+
+    .rank-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .rank-number {
+        font-size: 36px;
+    }
+
+    .rank-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .coming-soon-icon {
+        font-size: 48px;
+    }
+
+    .coming-soon-section h3 {
+        font-size: 18px;
+    }
+}
+
