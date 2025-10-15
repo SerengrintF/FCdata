@@ -393,17 +393,20 @@ function calculateControllerStats(matches) {
         keyboard: { wins: 0, total: 0 }
     };
     
-    // 최근 10경기에서 패드/키보드 대전만 필터링
-    const recentMatches = matches.slice(0, 10);
-    
-    recentMatches.forEach((match, index) => {
-        const userController = match.userController;
+    // 전체 경기에서 패드/키보드 대전 계산 (최근 10경기 제한 제거)
+    matches.forEach((match, index) => {
         const opponentController = match.opponentController;
         const matchResult = match.matchResult;
         
-        // 컨트롤러 타입을 문자열로 정규화
-        const userControllerType = userController ? userController.toString().toLowerCase() : '';
-        const opponentControllerType = opponentController ? opponentController.toString().toLowerCase() : '';
+        // 컨트롤러 타입 정규화 (숫자 -> 문자열 매핑)
+        let opponentControllerType = '';
+        if (opponentController === 0 || opponentController === '0') {
+            opponentControllerType = 'keyboard';
+        } else if (opponentController === 1 || opponentController === '1') {
+            opponentControllerType = 'pad';
+        } else if (typeof opponentController === 'string') {
+            opponentControllerType = opponentController.toLowerCase();
+        }
         
         // vs🎮 (패드): 상대방이 패드인 모든 경기
         if (opponentControllerType === 'pad' || opponentControllerType === 'gamepad') {
@@ -418,7 +421,7 @@ function calculateControllerStats(matches) {
         }
     });
     
-    return {
+    const result = {
         padWinRate: controllerStats.pad.total > 0 ? 
             (controllerStats.pad.wins / controllerStats.pad.total * 100).toFixed(1) : '0.0',
         keyboardWinRate: controllerStats.keyboard.total > 0 ? 
@@ -426,6 +429,8 @@ function calculateControllerStats(matches) {
         padMatches: controllerStats.pad.total,
         keyboardMatches: controllerStats.keyboard.total
     };
+    
+    return result;
 }
 
 // 패드/키보드 대전 승률 표시 함수
@@ -1291,9 +1296,6 @@ async function loadMoreMatches() {
         const data = await response.json();
         
         if (data.matches && data.matches.length > 0) {
-            // 대시보드 경기 기록에 추가
-            dashboardMatches = dashboardMatches.concat(data.matches);
-            
             // 화면에 추가 경기 표시
             displayMoreMatches(data.matches);
             
@@ -1311,6 +1313,9 @@ async function loadMoreMatches() {
             
             // 주요 선수 갱신 (대시보드 경기 기준으로 재계산)
             displayTopPlayers(dashboardMatches);
+            
+            // 컨트롤러 통계 갱신
+            displayControllerStats(dashboardMatches);
             
             // 추가 후 경기 수 확인
             
@@ -1353,6 +1358,16 @@ function displayMoreMatches(moreMatches) {
     // 현재 사용자 정보에 새로운 경기들을 추가 (최신 경기가 앞에 오도록)
     if (currentUserInfo && currentUserInfo.matches) {
         currentUserInfo.matches = [...moreMatches, ...currentUserInfo.matches];
+        
+        // 대시보드 매치 데이터도 동일하게 업데이트
+        dashboardMatches = [...moreMatches, ...dashboardMatches];
+        
+        // 대시보드 매치 데이터를 날짜순으로 정렬 (최신순)
+        dashboardMatches.sort((a, b) => {
+            const dateA = new Date(a.matchDate);
+            const dateB = new Date(b.matchDate);
+            return dateB - dateA; // 최신순
+        });
         
         // 통계 재계산 및 업데이트
         updateMatchStatistics();
@@ -1430,11 +1445,6 @@ function displayMoreMatches(moreMatches) {
     
     // 경기 수 업데이트
     updateMatchCount();
-    
-    // 컨트롤러 통계 업데이트
-    if (currentUserInfo && currentUserInfo.matches) {
-        displayControllerStats(currentUserInfo.matches);
-    }
 }
 
 // 정보 아이템 추가
