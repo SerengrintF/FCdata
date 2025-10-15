@@ -349,7 +349,6 @@ async function searchUser() {
         
         // 관리자 대시보드 확인
         if (userInfo.isAdmin && userInfo.adminDashboard) {
-            console.log('[프론트엔드] 관리자 대시보드 표시 중...');
             displayAdminDashboard(userInfo.adminDashboard);
             return;
         }
@@ -817,8 +816,6 @@ function unlockScroll() {
 
 // 관리자 대시보드 표시 함수
 function displayAdminDashboard(stats) {
-    console.log('[관리자 대시보드] 표시 함수 실행됨', stats);
-    
     // 기존 UI 숨기기
     playerBasicInfo.style.display = 'none';
     tabContainer.style.display = 'none';

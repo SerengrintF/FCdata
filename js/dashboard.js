@@ -18,6 +18,9 @@
         // 경기력 트렌드 표시
         displayTrend(matchStats.trend);
         
+        // 패드/키보드 대전 승률 표시
+        displayControllerStats(dashboardMatches);
+        
         // 골 유형 분석 표시
         displayGoalAnalysis(matchStats.goalTypes);
         
@@ -45,6 +48,12 @@
         avgGoals.textContent = '-';
         avgConceded.textContent = '-';
         trendText.textContent = '-';
+        
+        // 패드/키보드 대전 승률 기본값
+        const padWinRateElement = document.getElementById('padWinRate');
+        const keyboardWinRateElement = document.getElementById('keyboardWinRate');
+        if (padWinRateElement) padWinRateElement.textContent = '-';
+        if (keyboardWinRateElement) keyboardWinRateElement.textContent = '-';
         
         // 트렌드 이모지도 초기화
         const trendIcon = document.querySelector('.trend-icon');
@@ -375,6 +384,86 @@ function displayTrend(trend) {
                 trendTextElement.style.color = '#ffa502';
         }
     }
+}
+
+// 패드/키보드 대전 승률 계산 함수
+function calculateControllerStats(matches) {
+    const controllerStats = {
+        pad: { wins: 0, total: 0 },
+        keyboard: { wins: 0, total: 0 }
+    };
+    
+    // 최근 10경기에서 패드/키보드 대전만 필터링
+    const recentMatches = matches.slice(0, 10);
+    
+    recentMatches.forEach((match, index) => {
+        const userController = match.userController;
+        const opponentController = match.opponentController;
+        const matchResult = match.matchResult;
+        
+        // 컨트롤러 타입을 문자열로 정규화
+        const userControllerType = userController ? userController.toString().toLowerCase() : '';
+        const opponentControllerType = opponentController ? opponentController.toString().toLowerCase() : '';
+        
+        // vs🎮 (패드): 상대방이 패드인 모든 경기
+        if (opponentControllerType === 'pad' || opponentControllerType === 'gamepad') {
+            controllerStats.pad.total++;
+            if (matchResult === 1) controllerStats.pad.wins++;
+        }
+        
+        // vs⌨️ (키보드): 상대방이 키보드인 모든 경기
+        if (opponentControllerType === 'keyboard') {
+            controllerStats.keyboard.total++;
+            if (matchResult === 1) controllerStats.keyboard.wins++;
+        }
+    });
+    
+    return {
+        padWinRate: controllerStats.pad.total > 0 ? 
+            (controllerStats.pad.wins / controllerStats.pad.total * 100).toFixed(1) : '0.0',
+        keyboardWinRate: controllerStats.keyboard.total > 0 ? 
+            (controllerStats.keyboard.wins / controllerStats.keyboard.total * 100).toFixed(1) : '0.0',
+        padMatches: controllerStats.pad.total,
+        keyboardMatches: controllerStats.keyboard.total
+    };
+}
+
+// 패드/키보드 대전 승률 표시 함수
+function displayControllerStats(matches) {
+    const stats = calculateControllerStats(matches);
+    
+    const padWinRateElement = document.getElementById('padWinRate');
+    const keyboardWinRateElement = document.getElementById('keyboardWinRate');
+    
+    if (padWinRateElement) {
+        padWinRateElement.textContent = `${stats.padWinRate}%`;
+        const padWinRate = parseFloat(stats.padWinRate);
+        padWinRateElement.className = `controller-value summary-value ${getStatClass(padWinRate, 'winRate')}`;
+    }
+    
+    if (keyboardWinRateElement) {
+        keyboardWinRateElement.textContent = `${stats.keyboardWinRate}%`;
+        const keyboardWinRate = parseFloat(stats.keyboardWinRate);
+        keyboardWinRateElement.className = `controller-value summary-value ${getStatClass(keyboardWinRate, 'winRate')}`;
+    }
+}
+
+// 통계 값에 따른 CSS 클래스 반환
+function getStatClass(value, type) {
+    if (type === 'winRate') {
+        if (value >= 70) return 'high';
+        if (value >= 50) return 'medium';
+        return 'low';
+    } else if (type === 'success') {
+        if (value >= 60) return 'high';
+        if (value >= 40) return 'medium';
+        return 'low';
+    } else if (type === 'rating') {
+        if (value >= 7.0) return 'high';
+        if (value >= 6.0) return 'medium';
+        return 'low';
+    }
+    return '';
 }
 
 // 골 유형 분석 표시
@@ -1341,6 +1430,11 @@ function displayMoreMatches(moreMatches) {
     
     // 경기 수 업데이트
     updateMatchCount();
+    
+    // 컨트롤러 통계 업데이트
+    if (currentUserInfo && currentUserInfo.matches) {
+        displayControllerStats(currentUserInfo.matches);
+    }
 }
 
 // 정보 아이템 추가

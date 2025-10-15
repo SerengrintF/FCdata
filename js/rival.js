@@ -232,8 +232,159 @@ class RivalMatchManager {
         // 비교 차트 렌더링
         this.renderComparisonChart();
         
+        // 승리를 위한 솔루션 카드 렌더링 (비교 차트와 경기기록 사이)
+        this.renderVictorySolutionCard();
+        
         // 경기 목록 렌더링 (대시보드 스타일 사용)
         this.renderMatchList();
+    }
+
+    // 승리를 위한 솔루션 카드 렌더링
+    renderVictorySolutionCard() {
+        const resultContainer = document.getElementById('rivalResultContainer');
+        const matchListContainer = document.getElementById('rivalMatchList');
+        
+        // 솔루션 카드 HTML 생성
+        const solutionCard = document.createElement('div');
+        solutionCard.className = 'victory-solution-card';
+        solutionCard.innerHTML = this.createVictorySolutionHTML();
+        
+        // 경기 목록 컨테이너 앞에 삽입 (비교 차트와 경기기록 사이)
+        if (matchListContainer) {
+            resultContainer.insertBefore(solutionCard, matchListContainer);
+        } else {
+            // 경기 목록이 아직 렌더링되지 않은 경우 맨 끝에 추가
+            resultContainer.appendChild(solutionCard);
+        }
+    }
+
+    // 승리 솔루션 HTML 생성
+    createVictorySolutionHTML() {
+        const analysis = this.analyzeVictoryData();
+        
+        return `
+            <div class="victory-solution-header">
+                <span class="victory-solution-icon">🎯</span>
+                <h3>승리를 위한 솔루션</h3>
+            </div>
+            <div class="victory-solution-content">
+                ${this.createFormationRecommendation(analysis)}
+                ${this.createPlayerRecommendation(analysis)}
+                ${this.createPlayStyleRecommendation(analysis)}
+            </div>
+        `;
+    }
+
+    // 포메이션 추천 생성
+    createFormationRecommendation(analysis) {
+        const bestFormation = analysis.bestFormation;
+        const formationStats = analysis.formationStats[bestFormation];
+        
+        return `
+            <div class="solution-item">
+                <div class="solution-item-header">
+                    <span class="solution-item-icon">⚽</span>
+                    <span class="solution-item-title">추천 포메이션</span>
+                </div>
+                <div class="solution-item-content">
+                    <strong>${bestFormation}</strong> 포메이션을 사용하세요
+                    <div class="solution-stats">
+                        <div class="solution-stat">
+                            <div class="solution-stat-value">${formationStats.winRate}%</div>
+                            <div class="solution-stat-label">승률</div>
+                        </div>
+                        <div class="solution-stat">
+                            <div class="solution-stat-value">${formationStats.matches}</div>
+                            <div class="solution-stat-label">경기수</div>
+                        </div>
+                    </div>
+                    <div class="solution-recommendation">
+                        <div class="solution-recommendation-title">💡 추천 이유</div>
+                        <div class="solution-recommendation-text">
+                            ${this.getFormationAdvice(bestFormation, formationStats)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 선수 추천 생성
+    createPlayerRecommendation(analysis) {
+        const topPlayers = analysis.topPlayers.slice(0, 3);
+        
+        // 선수 데이터가 없는 경우 대체 메시지
+        if (topPlayers.length === 0) {
+            return `
+                <div class="solution-item">
+                    <div class="solution-item-header">
+                        <span class="solution-item-icon">⭐</span>
+                        <span class="solution-item-title">추천 선수</span>
+                    </div>
+                    <div class="solution-item-content">
+                        <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                            <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
+                            <div>선수 데이터를 불러올 수 없습니다.</div>
+                            <div style="font-size: 12px; margin-top: 4px;">
+                                경기 상세 정보를 확인해보세요.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="solution-item">
+                <div class="solution-item-header">
+                    <span class="solution-item-icon">⭐</span>
+                    <span class="solution-item-title">추천 선수</span>
+                </div>
+                <div class="solution-item-content">
+                    ${topPlayers.map(player => `
+                        <div style="margin-bottom: 8px;">
+                            <strong>${player.name}</strong> - ${player.position}
+                            <div style="font-size: 12px; color: var(--text-secondary);">
+                                평균 평점: ${player.avgRating} | 경기수: ${player.matches}
+                            </div>
+                        </div>
+                    `).join('')}
+                    <div class="solution-recommendation">
+                        <div class="solution-recommendation-title">💡 활용 팁</div>
+                        <div class="solution-recommendation-text">
+                            ${this.getPlayerAdvice(topPlayers)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 플레이 스타일 추천 생성
+    createPlayStyleRecommendation(analysis) {
+        const improvements = analysis.improvements;
+        
+        return `
+            <div class="solution-item">
+                <div class="solution-item-header">
+                    <span class="solution-item-icon">📊</span>
+                    <span class="solution-item-title">개선 포인트</span>
+                </div>
+                <div class="solution-item-content">
+                    ${improvements.map(improvement => `
+                        <div class="improvement-item">
+                            <strong>${improvement.category}</strong>
+                            <div style="font-size: 13px; margin-top: 4px;">
+                                ${improvement.description}
+                            </div>
+                            <div style="font-size: 12px; color: #34c759; margin-top: 4px;">
+                                목표: ${improvement.target}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
     }
 
     // 라이벌 통계 계산
@@ -694,6 +845,159 @@ class RivalMatchManager {
             </div>
         `;
     }
+    }
+
+    // 승리 데이터 분석
+    analyzeVictoryData() {
+        const formationStats = {};
+        const playerStats = {};
+        const improvements = [];
+        
+        // 포메이션별 통계 계산
+        this.rivalMatches.forEach(match => {
+            const formation = match.formation || '4-4-2';
+            if (!formationStats[formation]) {
+                formationStats[formation] = { wins: 0, total: 0, matches: 0 };
+            }
+            
+            formationStats[formation].matches++;
+            formationStats[formation].total++;
+            if (match.matchResult === 1) {
+                formationStats[formation].wins++;
+            }
+        });
+        
+        // 포메이션 승률 계산
+        Object.keys(formationStats).forEach(formation => {
+            const stats = formationStats[formation];
+            stats.winRate = stats.total > 0 ? (stats.wins / stats.total * 100).toFixed(1) : 0;
+        });
+        
+        // 최고 승률 포메이션 찾기
+        const bestFormation = Object.keys(formationStats).length > 0 ? 
+            Object.keys(formationStats).reduce((best, current) => {
+                return formationStats[current].winRate > formationStats[best].winRate ? current : best;
+            }) : '4-4-2';
+        
+        // 선수별 통계 계산
+        this.rivalMatches.forEach(match => {
+            // 대시보드와 동일한 방식으로 선수 데이터 찾기
+            const userPlayers = match.matchDetail?.userPlayers || match.userPlayers;
+            
+            if (userPlayers && Array.isArray(userPlayers)) {
+                userPlayers.forEach(player => {
+                    // spid 또는 spId 둘 다 확인
+                    const spid = player.spid || player.spId;
+                    if (!spid) {
+                        return;
+                    }
+                    
+                    const playerName = player.spName || '알 수 없음';
+                    const position = this.getPositionName(player.spPosition) || 'Unknown';
+                    const rating = player.status?.spRating || 0;
+                    
+                    if (!playerStats[spid]) {
+                        playerStats[spid] = {
+                            spid: spid,
+                            name: playerName,
+                            position: position,
+                            totalRating: 0,
+                            matches: 0,
+                            wins: 0
+                        };
+                    }
+                    
+                    playerStats[spid].totalRating += rating;
+                    playerStats[spid].matches++;
+                    if (match.matchResult === 1) {
+                        playerStats[spid].wins++;
+                    }
+                });
+            }
+        });
+        
+        // 선수 평균 평점 계산 및 정렬
+        const topPlayers = Object.values(playerStats)
+            .map(player => ({
+                ...player,
+                avgRating: (player.totalRating / player.matches).toFixed(1),
+                winRate: (player.wins / player.matches * 100).toFixed(1)
+            }))
+            .sort((a, b) => parseFloat(b.avgRating) - parseFloat(a.avgRating))
+            .slice(0, 5);
+        
+        // 개선점 분석
+        const comparison = this.calculateComparison();
+        if (comparison.weaknesses.length > 0) {
+            comparison.weaknesses.forEach(weakness => {
+                improvements.push({
+                    category: weakness,
+                    description: this.getImprovementDescription(weakness),
+                    target: this.getImprovementTarget(weakness, comparison)
+                });
+            });
+        }
+        
+        return {
+            bestFormation,
+            formationStats,
+            topPlayers,
+            improvements
+        };
+    }
+
+    // 포메이션 조언 생성
+    getFormationAdvice(formation, stats) {
+        const advice = {
+            '4-4-2': '균형잡힌 공격과 수비를 원할 때 적합합니다. 측면 플레이가 강한 선수들을 활용하세요.',
+            '4-3-3': '공격적인 플레이를 원할 때 좋습니다. 빠른 윙어들과 강력한 중앙 공격수를 활용하세요.',
+            '3-5-2': '중앙 제어가 강한 포메이션입니다. 패스 플레이가 좋은 선수들을 중앙에 배치하세요.',
+            '4-2-3-1': '공격과 수비의 균형이 좋은 포메이션입니다. 창의적인 공격형 미드필더를 활용하세요.'
+        };
+        
+        return advice[formation] || '이 포메이션에서 좋은 성과를 보이고 있습니다. 계속 활용해보세요.';
+    }
+
+    // 선수 조언 생성
+    getPlayerAdvice(players) {
+        if (players.length === 0) return '선수 데이터가 부족합니다.';
+        
+        const topPlayer = players[0];
+        return `${topPlayer.name} 선수가 가장 좋은 성과를 보이고 있습니다. 이 선수를 중심으로 팀을 구성해보세요.`;
+    }
+
+    // 개선점 설명 생성
+    getImprovementDescription(category) {
+        const descriptions = {
+            '점유율': '볼 소유 시간을 늘려 경기를 주도하세요.',
+            '슈팅 수': '더 많은 슈팅 기회를 만들어보세요.',
+            '슈팅 정확도': '슈팅 정확도를 높이기 위해 연습하세요.',
+            '패스 성공률': '정확한 패스로 공격을 연결하세요.'
+        };
+        
+        return descriptions[category] || '이 부분을 개선하면 더 좋은 결과를 얻을 수 있습니다.';
+    }
+
+    // 개선 목표 생성
+    getImprovementTarget(category, comparison) {
+        const targets = {
+            '점유율': `현재 ${comparison.myPossession}% → 목표 ${parseFloat(comparison.myPossession) + 5}%`,
+            '슈팅 수': `현재 ${comparison.myShots}개 → 목표 ${parseFloat(comparison.myShots) + 2}개`,
+            '슈팅 정확도': `현재 ${comparison.myAccuracy}% → 목표 ${parseFloat(comparison.myAccuracy) + 10}%`,
+            '패스 성공률': `현재 ${comparison.myPassRate}% → 목표 ${parseFloat(comparison.myPassRate) + 5}%`
+        };
+        
+        return targets[category] || '지속적인 개선이 필요합니다.';
+    }
+
+    // 포지션 번호를 포지션 이름으로 변환
+    getPositionName(positionNumber) {
+        const positionMap = {
+            0: 'GK', 1: 'SW', 2: 'RWB', 3: 'RB', 4: 'RCB', 5: 'CB', 6: 'LCB', 7: 'LB', 8: 'LWB',
+            9: 'RDM', 10: 'CDM', 11: 'LDM', 12: 'RM', 13: 'RCM', 14: 'CM', 15: 'LCM', 16: 'LM',
+            17: 'RAM', 18: 'CAM', 19: 'LAM', 20: 'RF', 21: 'CF', 22: 'LF', 23: 'RW', 24: 'ST', 25: 'LW'
+        };
+        return positionMap[positionNumber] || 'Unknown';
     }
 
     // 초기화

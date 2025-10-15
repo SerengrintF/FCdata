@@ -477,7 +477,7 @@
 
 .rival-matches-header .match-count {
     font-size: 14px;
-    color: var(--text-secondary);
+    color: var(--text-accent);
     font-weight: 500;
 }
 
@@ -488,6 +488,138 @@
 }
 
 /* 대시보드 스타일을 상속받으므로 추가 스타일은 최소화 */
+
+/* 승리를 위한 솔루션 카드 */
+.victory-solution-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.victory-solution-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.05) 0%, rgba(0, 122, 255, 0.02) 100%);
+    pointer-events: none;
+}
+
+.victory-solution-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.victory-solution-header h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.victory-solution-icon {
+    font-size: 28px;
+}
+
+.victory-solution-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.solution-item {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.solution-item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.solution-item-icon {
+    font-size: 20px;
+}
+
+.solution-item-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.solution-item-content {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.solution-item-content .improvement-item {
+    margin-bottom: 12px;
+    padding: 8px;
+    background: rgba(52, 199, 89, 0.05);
+    border: 1px solid rgba(52, 199, 89, 0.2);
+    border-radius: 6px;
+}
+
+.solution-recommendation {
+    background: rgba(52, 199, 89, 0.05);
+    border: 1px solid rgba(52, 199, 89, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.solution-recommendation-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #34c759;
+    margin-bottom: 8px;
+}
+
+.solution-recommendation-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.solution-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.solution-stat {
+    text-align: center;
+}
+
+.solution-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #34c759;
+}
+
+.solution-stat-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
 
 /* 모바일 대응 */
 @media (max-width: 768px) {
@@ -557,6 +689,20 @@
 
     .comparison-summary {
         grid-template-columns: 1fr;
+    }
+
+    /* 솔루션 카드 모바일 */
+    .victory-solution-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .victory-solution-card {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .solution-item {
+        padding: 16px;
     }
 }
 
