@@ -319,8 +319,11 @@ async function searchUser() {
         hideError();
         hideResults();
         
+        // 선택된 매치코드 가져오기
+        const matchType = document.getElementById('matchTypeSelect').value;
+        
         // 서버 API 엔드포인트 호출 (서버에서 2단계 모두 처리)
-        const url = `/api/search/${encodeURIComponent(nickname)}`;
+        const url = `/api/search/${encodeURIComponent(nickname)}?matchType=${matchType}`;
         
         const response = await fetch(url, {
             method: 'GET',
@@ -355,6 +358,25 @@ async function searchUser() {
         
             if (userInfo) {
                 currentUserInfo = userInfo; // 전역 변수에 저장
+                
+                // 매치코드에 따라 라이벌 매치 탭 표시/숨김 처리
+                const rivalTabBtn = document.getElementById('rivalTabBtn');
+                
+                if (rivalTabBtn) {
+                    if (matchType === '50' || matchType === '60') {
+                        // 공식경기 또는 친선경기: 라이벌 매치 탭 표시
+                        rivalTabBtn.style.display = 'block';
+                    } else if (matchType === '52') {
+                        // 감독모드: 라이벌 매치 탭 숨김
+                        rivalTabBtn.style.display = 'none';
+                        
+                        // 현재 라이벌 매치 탭이 활성화되어 있다면 대시보드로 이동
+                        const activeTab = document.querySelector('.tab-btn.active');
+                        if (activeTab && activeTab.dataset.tab === 'rival') {
+                            switchTab('dashboard');
+                        }
+                    }
+                }
                 
                 // 각 탭별 데이터 초기화
                 dashboardMatches = userInfo.matches || [];
@@ -648,6 +670,106 @@ function getGradeEmoji(grade) {
     };
     
     return gradeMap[grade] || '⚪';
+}
+
+// 슛 유형 계산 팝업 표시 함수 (전역)
+function showShootTypeCalculation(type, percent, count, total) {
+    const typeNames = {
+        'closeRange': '근거리 슛',
+        'midRange': '중거리 슛', 
+        'heading': '헤딩 슛'
+    };
+    
+    const typeName = typeNames[type] || type;
+    
+    // 기존 팝업이 있다면 제거
+    const existingPopup = document.getElementById('shootCalculationPopup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+    
+    const popup = document.createElement('div');
+    popup.id = 'shootCalculationPopup';
+    popup.className = 'calculation-popup-overlay';
+    // 대시보드와 동일한 설명 방식으로 수정
+    let content = '';
+    const emojiMap = {
+        'closeRange': '⚽',
+        'midRange': '🚀', 
+        'heading': '💥'
+    };
+    const emoji = emojiMap[type] || '⚽';
+    
+    content = `
+        <div class="calculation-popup">
+            <div class="popup-header">
+                <h3>${emoji} ${typeName} 계산 과정</h3>
+                <button class="popup-close" onclick="closeShootCalculationPopup()">&times;</button>
+            </div>
+            <div class="popup-content">
+                <div class="calculation-step">
+                    <p><strong>총 슛 시도:</strong> ${total}회</p>
+                    <p><strong>${typeName} 시도:</strong> ${count}회</p>
+                    <p><strong>계산식:</strong> (${count} ÷ ${total}) × 100 = ${percent}%</p>
+                    <p><strong>분석 기간:</strong> 해당 포메이션 경기</p>
+                </div>
+                <div class="calculation-note">
+                    <p>💡 <strong>${typeName}:</strong> ${getShootTypeDescription(type)}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    popup.innerHTML = content;
+    
+    document.body.appendChild(popup);
+    
+    // 대시보드와 동일한 스타일 적용
+    popup.setAttribute('style', `
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: rgba(0, 0, 0, 0.7) !important;
+        z-index: 9999 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    `);
+    
+    // 스크롤 잠금
+    lockScroll();
+    
+    // 모달 외부 클릭 시 닫기
+    popup.addEventListener('click', function(e) {
+        if (e.target === popup) {
+            closeShootCalculationPopup();
+        }
+    });
+}
+
+// 슛 유형별 설명 반환 함수
+function getShootTypeDescription(type) {
+    const descriptions = {
+        'closeRange': '페널티 박스 안에서 시도한 슛을 의미합니다.',
+        'midRange': '페널티 박스 밖에서 시도한 슛을 의미합니다.',
+        'heading': '헤딩으로 시도한 슛을 의미합니다.'
+    };
+    return descriptions[type] || '슛을 의미합니다.';
+}
+
+// 슛 유형 계산 팝업 닫기 함수
+function closeShootCalculationPopup() {
+    const popup = document.getElementById('shootCalculationPopup');
+    if (popup) {
+        popup.remove();
+        unlockScroll();
+    }
 }
 
 // 등급 텍스트 설정 (간소화된 버전) - 기존 함수 유지

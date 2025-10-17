@@ -1045,6 +1045,123 @@
         height: 16px;
     }
     
+    /* 슛 유형 클릭 가능한 퍼센트 스타일 */
+    .clickable-percent {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
+    
+    .clickable-percent:hover {
+        background-color: var(--bg-hover);
+        color: var(--text-accent);
+        transform: scale(1.05);
+    }
+    
+    /* 슛 유형 계산 팝업 스타일 - 대시보드와 동일 */
+    .calculation-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+    
+    .calculation-popup {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .popup-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .popup-header h3 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .popup-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+    
+    .popup-close:hover {
+        background-color: var(--bg-hover);
+        color: var(--text-primary);
+    }
+    
+    .popup-content {
+        padding: 20px 24px 24px;
+    }
+    
+    .calculation-step {
+        margin-bottom: 20px;
+        padding: 16px;
+        background: var(--bg-subtle);
+        border-radius: var(--radius-md);
+        border-left: 4px solid var(--accent-color);
+    }
+    
+    .calculation-step:last-child {
+        margin-bottom: 0;
+    }
+    
+    .calculation-step p {
+        margin: 8px 0;
+        color: var(--text-primary);
+        line-height: 1.5;
+    }
+    
+    .calculation-step p:first-child {
+        margin-top: 0;
+        font-weight: 600;
+        color: var(--text-accent);
+    }
+    
+    .calculation-note {
+        margin-top: 16px;
+        padding: 12px;
+        background: var(--bg-info);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-info);
+    }
+    
+    .calculation-note p {
+        margin: 0;
+        color: var(--text-info);
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
     
     .search-box {
         flex-direction: column;
@@ -1738,7 +1855,7 @@
 
 .match-loading {
     text-align: center;
-    padding: 20px;
+    padding: 0;
     color: var(--text-secondary);
 }
 

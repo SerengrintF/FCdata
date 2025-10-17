@@ -1279,8 +1279,11 @@ async function loadMoreMatches() {
         loadMoreBtn.disabled = true;
         loadMoreBtn.innerHTML = '로딩 중...';
         
+        // 선택된 매치코드 가져오기
+        const matchType = document.getElementById('matchTypeSelect').value;
+        
         // 추가 경기 기록 조회 (10개씩 요청)
-        const url = `/api/more-matches/${currentUserInfo.ouid}/${dashboardOffset}/10`;
+        const url = `/api/more-matches/${currentUserInfo.ouid}/${dashboardOffset}/10?matchType=${matchType}`;
         
         const response = await fetch(url, {
             method: 'GET',

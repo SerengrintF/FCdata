@@ -27,7 +27,9 @@
                 showFormationLoading(`정확한 분석을 위해 데이터 로드 중입니다... (${matchesToAnalyze.length}/${targetCount}경기)`);
                 
                 try {
-                    const response = await fetch(`/api/more-matches/${currentUserInfo.ouid}/${formationTabOffset}/${batchSize}`);
+                    // 선택된 매치코드 가져오기
+                    const matchType = document.getElementById('matchTypeSelect').value;
+                    const response = await fetch(`/api/more-matches/${currentUserInfo.ouid}/${formationTabOffset}/${batchSize}?matchType=${matchType}`);
                     
                     if (!response.ok) {
                         break;
@@ -500,6 +502,15 @@ function displayFormationDetail(opponentFormation) {
     // 통계 계산
     const stats = calculateFormationVsStats(filteredMatches);
     
+    // 슛 유형 데이터 계산
+    const shootTypes = calculateFormationShootTypes(filteredMatches);
+    const shootData = {
+        totalShoots: shootTypes.totalShoots,
+        closeRangeShoots: shootTypes.closeRangeShoots,
+        midRangeShoots: shootTypes.midRangeShoots,
+        headingShoots: shootTypes.headingShoots
+    };
+    
     // 비교 분석
     const analysis = analyzeFormationPerformance(stats, filteredMatches);
     
@@ -611,6 +622,33 @@ function displayFormationDetail(opponentFormation) {
                             <div class="metric-fill" style="width: ${stats.defenseSuccess}%;"></div>
                         </div>
                         <span class="metric-value">${stats.defenseSuccess.toFixed(1)}%</span>
+                    </div>
+                </div>
+                <div class="metric-item-inline">
+                    <div class="metric-label">근거리 시도</div>
+                    <div class="metric-bar-wrapper">
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="width: ${shootTypes.closeRange}%;"></div>
+                        </div>
+                        <span class="metric-value clickable-percent" onclick="showShootTypeCalculation('closeRange', ${shootTypes.closeRange}, ${shootData.closeRangeShoots}, ${shootData.totalShoots})">${shootTypes.closeRange}%</span>
+                    </div>
+                </div>
+                <div class="metric-item-inline">
+                    <div class="metric-label">중거리 시도</div>
+                    <div class="metric-bar-wrapper">
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="width: ${shootTypes.midRange}%;"></div>
+                        </div>
+                        <span class="metric-value clickable-percent" onclick="showShootTypeCalculation('midRange', ${shootTypes.midRange}, ${shootData.midRangeShoots}, ${shootData.totalShoots})">${shootTypes.midRange}%</span>
+                    </div>
+                </div>
+                <div class="metric-item-inline">
+                    <div class="metric-label">헤딩 시도</div>
+                    <div class="metric-bar-wrapper">
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="width: ${shootTypes.heading}%;"></div>
+                        </div>
+                        <span class="metric-value clickable-percent" onclick="showShootTypeCalculation('heading', ${shootTypes.heading}, ${shootData.headingShoots}, ${shootData.totalShoots})">${shootTypes.heading}%</span>
                     </div>
                 </div>
             </div>
@@ -903,6 +941,65 @@ function generateQuickSummary(stats, matches, analysis) {
         detailedAnalysis // 분석 데이터 전달
     };
 }
+
+// 포메이션별 슛 유형 계산 함수
+function calculateFormationShootTypes(matches) {
+    if (!matches || matches.length === 0) {
+        return { 
+            closeRange: 0, 
+            midRange: 0, 
+            heading: 0,
+            totalShoots: 0,
+            closeRangeShoots: 0,
+            midRangeShoots: 0,
+            headingShoots: 0
+        };
+    }
+    
+    let totalShoots = 0;
+    let closeRangeShoots = 0;
+    let midRangeShoots = 0;
+    let headingShoots = 0;
+    
+    matches.forEach(match => {
+        const userStats = match.userStats;
+        if (userStats && userStats.shoot) {
+            const shoot = userStats.shoot;
+            
+            totalShoots += shoot.shootTotal || 0;
+            closeRangeShoots += shoot.shootInPenalty || 0;
+            midRangeShoots += shoot.shootOutPenalty || 0;
+            headingShoots += shoot.shootHeading || 0;
+        }
+    });
+    
+    if (totalShoots === 0) {
+        return { 
+            closeRange: 0, 
+            midRange: 0, 
+            heading: 0,
+            totalShoots: 0,
+            closeRangeShoots: 0,
+            midRangeShoots: 0,
+            headingShoots: 0
+        };
+    }
+    
+    const closeRangePercent = Math.round((closeRangeShoots / totalShoots) * 100);
+    const midRangePercent = Math.round((midRangeShoots / totalShoots) * 100);
+    const headingPercent = Math.round((headingShoots / totalShoots) * 100);
+    
+    return {
+        closeRange: closeRangePercent,
+        midRange: midRangePercent,
+        heading: headingPercent,
+        totalShoots: totalShoots,
+        closeRangeShoots: closeRangeShoots,
+        midRangeShoots: midRangeShoots,
+        headingShoots: headingShoots
+    };
+}
+
 
 // 상대 포메이션에 대한 최적 포메이션 추천 함수
 function analyzeCounterFormation(opponentFormation, matches, feedback) {

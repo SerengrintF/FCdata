@@ -27,6 +27,16 @@ let topPlayersTotalSlides = 0;
 let teamDataCache = null;
 let teamDataLoaded = false;
 
+// 매치 타입 텍스트 변환 함수
+function getMatchTypeText(matchType) {
+    switch(matchType) {
+        case 50: return '공식경기';
+        case 52: return '감독모드';
+        case 60: return '친선경기';
+        default: return '친선경기';
+    }
+}
+
 // 강화 등급 정보 함수 (dashboard.js와 동일)
 function getGradeInfo(grade) {
     const gradeMap = {
@@ -110,7 +120,9 @@ async function analyzeTeamData() {
                     // 로딩 메시지 업데이트
                     showTeamLoading(`정확한 분석을 위해 데이터 로드 중입니다... (${matchesToAnalyze.length}/${targetCount}경기)`);
                     
-                    const response = await fetch(`/api/more-matches/${currentUserInfo.ouid}/${teamTabOffset}/${batchSize}`);
+                    // 선택된 매치코드 가져오기
+                    const matchType = document.getElementById('matchTypeSelect').value;
+                    const response = await fetch(`/api/more-matches/${currentUserInfo.ouid}/${teamTabOffset}/${batchSize}?matchType=${matchType}`);
                     if (response.ok) {
                         const data = await response.json();
                         if (data.matches && data.matches.length > 0) {
@@ -1210,7 +1222,7 @@ function createFormationMatchItem(match) {
             <div class="team-formation-match-details">
                 <div class="team-formation-match-opponent">vs 상대팀</div>
                 <div class="team-formation-match-score">${getMatchScore(match.matchId)}</div>
-                <div class="team-formation-match-opponent">${match.matchType === 50 ? '공식경기' : '친선경기'}</div>
+                <div class="team-formation-match-opponent">${getMatchTypeText(match.matchType)}</div>
             </div>
             <div class="team-formation-match-players">
                 ${match.players.map(player => createFormationMatchPlayer(player)).join('')}

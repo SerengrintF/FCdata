@@ -9,13 +9,13 @@
     margin: 0 auto;
 }
 
-/* 로딩 컨테이너 */
+/* 로딩 컨테이너 - 박스 제거 */
 .loading-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
+    padding: 0;
     gap: 20px;
 }
 

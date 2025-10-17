@@ -110,7 +110,7 @@ body.modal-open {
 .main-header {
     background: var(--bg-header);
     border-bottom: 1px solid var(--border-color);
-    padding: 12px 0;
+    padding: 8px 0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -145,7 +145,7 @@ body.modal-open {
 }
 
 .logo-text h1 {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 900;
     margin: 0;
     letter-spacing: -1px;
@@ -171,9 +171,9 @@ body.modal-open {
 
 /* 로고 이미지 스타일 */
 .logo-image {
-    height: 100px;
+    height: 80px;
     width: auto;
-    max-width: 400px;
+    max-width: 150px;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
@@ -186,7 +186,7 @@ body.modal-open {
 }
 
 .action-btn {
-    padding: 10px 16px;
+    padding: 8px 14px;
     border-radius: var(--radius-md);
     font-size: 13px;
     font-weight: 600;
@@ -409,6 +409,59 @@ body.modal-open {
 }
 
 
+/* 매치코드 선택 (검색바 왼쪽) */
+.match-type-select {
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    min-width: 120px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.match-type-select:hover {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.match-type-select:focus {
+    outline: none;
+    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--text-accent);
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.2);
+}
+
+.match-type-select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 8px;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .search-section {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .match-type-select {
+        width: 100%;
+    }
+    
+    .search-input-container {
+        width: 100%;
+    }
+    
+    #searchBtn {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
 /* 검색 섹션 - 현대적 카드 디자인 */
 .search-section {
     background: var(--bg-card);
@@ -419,6 +472,9 @@ body.modal-open {
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-normal);
     overflow: visible;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .search-section:hover {
@@ -426,34 +482,21 @@ body.modal-open {
     border-color: var(--border-hover);
 }
 
-.search-section:hover .search-box {
-    border-color: var(--border-accent);
-}
-
-.search-box {
-    display: flex;
-    gap: 1px;
-    margin-bottom: 16px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-    background: var(--bg-secondary);
-}
-
 .search-input-container {
-    flex: 3;
+    flex: 1;
     position: relative;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    background: transparent;
+    border-radius: 0;
     overflow: visible;
 }
 
 #nicknameInput {
     width: 100%;
-    padding: 14px 16px;
-    border: none;
-    border-radius: 0;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
     font-size: 14px;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.3);
     color: var(--text-primary);
     transition: all var(--transition-fast);
     font-weight: 500;
@@ -462,7 +505,9 @@ body.modal-open {
 
 #nicknameInput:focus {
     outline: none;
-    background: var(--bg-primary);
+    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--text-accent);
+    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.2);
 }
 
 #nicknameInput::placeholder {
@@ -686,11 +731,11 @@ body.modal-open {
 }
 
 #searchBtn {
-    padding: 14px 32px;
+    padding: 10px 24px;
     background: var(--bg-accent);
     color: var(--text-inverse);
     border: none;
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    border-radius: var(--radius-md);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -711,16 +756,21 @@ body.modal-open {
     transform: translateY(0);
 }
 
-/* 로딩 스타일 */
+/* 로딩 스타일 - 박스 제거 */
 .loading {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 20px;
+    padding: 0;
+    margin: 0;
     color: var(--text-accent);
     font-size: 14px;
     font-weight: 500;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .spinner {
