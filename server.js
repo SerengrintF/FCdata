@@ -94,7 +94,4 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, () => {
-    console.log(`✅ Server running on port ${port}`);
-    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔑 Admin: ${process.env.ADMIN_NICKNAME || 'not set'}`);
 });

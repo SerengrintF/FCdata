@@ -168,8 +168,16 @@
 function displayFormationPerformances(performances) {
     if (!formationPerformanceTrack) return;
     
-    // 슬라이더 초기화
+    // 기존 슬라이드 완전히 제거
     formationPerformanceTrack.innerHTML = '';
+    
+    // 기존 모바일 요소 제거
+    const existingIndicators = document.querySelector('.formation-performance-indicators');
+    const existingHint = document.querySelector('.formation-swipe-hint');
+    if (existingIndicators) existingIndicators.remove();
+    if (existingHint) existingHint.remove();
+    
+    // 슬라이더 초기화
     formationCurrentSlideIndex = 0;
     formationTotalSlides = Math.ceil(performances.length / formationCardsPerSlide);
     
@@ -237,6 +245,220 @@ function displayFormationPerformances(performances) {
     if (formationSliderNextBtn) {
         formationSliderNextBtn.onclick = () => moveFormationSlide(1);
     }
+    
+    // 모바일에서만 추가 기능 적용
+    if (window.innerWidth <= 1024) {
+        setupMobileFormationPerformance(performances);
+    }
+}
+
+// 모바일 포메이션 성과 설정
+function setupMobileFormationPerformance(performances) {
+    // 기존 모바일 기능 제거
+    const existingIndicators = document.querySelector('.formation-performance-indicators');
+    const existingHint = document.querySelector('.formation-swipe-hint');
+    if (existingIndicators) existingIndicators.remove();
+    if (existingHint) existingHint.remove();
+    
+    // 모바일용으로 슬라이드 재구성
+    if (formationPerformanceTrack) {
+        formationPerformanceTrack.innerHTML = '';
+        
+        // 각 포메이션을 개별 슬라이드로 생성
+        performances.forEach((perf, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'formation-performance-slide';
+            
+            const card = document.createElement('div');
+            card.className = 'formation-performance-card';
+            
+            const winRateClass = perf.winRate >= 50 ? 'good' : 'bad';
+            const avgGoalsClass = perf.avgGoals >= 2 ? 'good' : '';
+            const avgConcedeClass = perf.avgConcede <= 1.5 ? 'good' : 'bad';
+            
+            card.innerHTML = `
+                <div class="formation-performance-header">
+                    <div class="formation-name">${perf.formation}</div>
+                    <div class="formation-match-count">${perf.matchCount}경기</div>
+                </div>
+                <div class="formation-performance-stats">
+                    <div class="formation-stat-item">
+                        <span class="formation-stat-label">승률</span>
+                        <span class="formation-stat-value ${winRateClass}">${perf.winRate}%</span>
+                    </div>
+                    <div class="formation-stat-item">
+                        <span class="formation-stat-label">평균득점</span>
+                        <span class="formation-stat-value ${avgGoalsClass}">${perf.avgGoals.toFixed(1)}</span>
+                    </div>
+                    <div class="formation-stat-item">
+                        <span class="formation-stat-label">평균실점</span>
+                        <span class="formation-stat-value ${avgConcedeClass}">${perf.avgConcede.toFixed(1)}</span>
+                    </div>
+                </div>
+            `;
+            
+            // 클릭 이벤트 추가
+            card.addEventListener('click', () => {
+                selectFormationPerformance(perf, card);
+            });
+            
+            slide.appendChild(card);
+            formationPerformanceTrack.appendChild(slide);
+        });
+    }
+    
+    // 모바일용 인디케이터와 스와이프 기능 추가
+    createFormationPerformanceIndicators(performances);
+    setupFormationPerformanceSwipe();
+    setupFormationPerformanceScrollListener();
+    
+    // 포메이션 데이터를 전역 변수에 저장 (리사이즈 처리용)
+    window.currentFormationPerformances = performances;
+}
+
+// 포메이션 성과 인디케이터 생성
+function createFormationPerformanceIndicators(performances) {
+    const sliderContainer = document.querySelector('.formation-performance-slider-container');
+    if (!sliderContainer) return;
+    
+    // 기존 인디케이터 제거
+    const existingIndicators = sliderContainer.querySelector('.formation-performance-indicators');
+    if (existingIndicators) {
+        existingIndicators.remove();
+    }
+    
+    // 인디케이터 컨테이너 생성
+    const indicatorsContainer = document.createElement('div');
+    indicatorsContainer.className = 'formation-performance-indicators';
+    
+    // 인디케이터 도트 생성
+    performances.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.className = 'formation-indicator-dot';
+        if (index === 0) dot.classList.add('active');
+        
+        dot.addEventListener('click', () => {
+            scrollToFormationSlide(index);
+        });
+        
+        indicatorsContainer.appendChild(dot);
+    });
+    
+    // 스와이프 힌트 추가
+    const swipeHint = document.createElement('div');
+    swipeHint.className = 'formation-swipe-hint';
+    swipeHint.textContent = '← 좌우로 스와이프하여 포메이션을 확인하세요 →';
+    
+    // 슬라이더 컨테이너에 추가
+    sliderContainer.appendChild(indicatorsContainer);
+    sliderContainer.appendChild(swipeHint);
+}
+
+// 포메이션 슬라이드로 스크롤
+function scrollToFormationSlide(index) {
+    if (!formationPerformanceTrack) return;
+    
+    const slideWidth = formationPerformanceTrack.offsetWidth;
+    const scrollPosition = index * slideWidth;
+    
+    formationPerformanceTrack.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+    });
+    
+    updateFormationPerformanceIndicators();
+}
+
+// 포메이션 성과 인디케이터 업데이트
+function updateFormationPerformanceIndicators() {
+    if (!formationPerformanceTrack) return;
+    
+    const indicators = document.querySelectorAll('.formation-indicator-dot');
+    if (indicators.length === 0) return;
+    
+    const slideWidth = formationPerformanceTrack.offsetWidth;
+    const currentIndex = Math.round(formationPerformanceTrack.scrollLeft / slideWidth);
+    
+    indicators.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
+    });
+}
+
+// 포메이션 성과 스와이프 설정
+function setupFormationPerformanceSwipe() {
+    if (!formationPerformanceTrack) return;
+    
+    let startX = 0;
+    let startY = 0;
+    let isScrolling = false;
+    let startTime = 0;
+    
+    formationPerformanceTrack.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = Date.now();
+        isScrolling = false;
+    }, { passive: true });
+    
+    formationPerformanceTrack.addEventListener('touchmove', (e) => {
+        if (!e.cancelable) return;
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = Math.abs(currentX - startX);
+        const diffY = Math.abs(currentY - startY);
+        
+        // 수직 스크롤이 더 크면 기본 동작 허용
+        if (diffY > diffX) {
+            return;
+        }
+        
+        // 수평 스크롤이 더 크면 기본 동작 방지
+        if (diffX > 5) { // 최소 스와이프 거리 설정
+            e.preventDefault();
+            isScrolling = true;
+        }
+    }, { passive: false });
+    
+    formationPerformanceTrack.addEventListener('touchend', (e) => {
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        
+        if (isScrolling && duration < 500) { // 빠른 스와이프만 처리
+            const endX = e.changedTouches[0].clientX;
+            const diffX = endX - startX;
+            const slideWidth = formationPerformanceTrack.offsetWidth;
+            
+            if (Math.abs(diffX) > slideWidth * 0.15) { // 15% 이상 스와이프 시 슬라이드 이동
+                const currentScroll = formationPerformanceTrack.scrollLeft;
+                const targetScroll = diffX > 0 ? 
+                    currentScroll - slideWidth : 
+                    currentScroll + slideWidth;
+                
+                formationPerformanceTrack.scrollTo({
+                    left: targetScroll,
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        if (isScrolling) {
+            updateFormationPerformanceIndicators();
+        }
+    }, { passive: true });
+}
+
+// 포메이션 성과 스크롤 리스너 설정
+function setupFormationPerformanceScrollListener() {
+    if (!formationPerformanceTrack) return;
+    
+    let scrollTimeout;
+    formationPerformanceTrack.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            updateFormationPerformanceIndicators();
+        }, 100);
+    });
 }
 
 // 포메이션 슬라이더 이동
@@ -313,6 +535,9 @@ function displayFormationGroups(selectedFormation) {
         .sort((a, b) => b[1] - a[1])
         .map(([formation, count]) => ({ formation, count }));
     
+    // 상대방 포메이션 데이터를 전역 변수에 저장 (리사이즈 처리용)
+    window.currentOpponentFormations = sortedOpponentFormations;
+    
     
     // HTML 생성
     groupsSection.innerHTML = `
@@ -351,7 +576,7 @@ function displayFormationGroups(selectedFormation) {
                                 <div class="opponent-formation-name">${formation}</div>
                                 <div class="opponent-formation-count">${count}경기</div>
                             </div>
-                        `)}
+                       `).join('')}
                     </div>
                 </div>
                 <button class="opponent-slider-btn opponent-next-btn" id="opponentNextBtn">
@@ -386,37 +611,46 @@ function initOpponentFormationSlider() {
     
     if (!slider || !track || !boxes || boxes.length === 0) return;
     
-    let currentScroll = 0;
-    const scrollAmount = 200; // 한 번에 스크롤할 픽셀 수
+    // 모바일/데스크탑 구분
+    const isMobile = window.innerWidth <= 1024;
     
-    // 이전 버튼 클릭
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            currentScroll = Math.max(0, currentScroll - scrollAmount);
-            track.style.transform = `translateX(-${currentScroll}px)`;
-            updateOpponentSliderButtons();
-        });
-    }
-    
-    // 다음 버튼 클릭
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
+    if (isMobile) {
+        // 모바일: 스와이프 기능과 인디케이터 추가
+        setupMobileOpponentFormationSlider(boxes);
+    } else {
+        // 데스크탑: 기존 버튼 방식
+        let currentScroll = 0;
+        const scrollAmount = 200; // 한 번에 스크롤할 픽셀 수
+        
+        // 이전 버튼 클릭
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                currentScroll = Math.max(0, currentScroll - scrollAmount);
+                track.style.transform = `translateX(-${currentScroll}px)`;
+                updateOpponentSliderButtons();
+            });
+        }
+        
+        // 다음 버튼 클릭
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const maxScroll = track.scrollWidth - slider.clientWidth;
+                currentScroll = Math.min(maxScroll, currentScroll + scrollAmount);
+                track.style.transform = `translateX(-${currentScroll}px)`;
+                updateOpponentSliderButtons();
+            });
+        }
+        
+        // 버튼 상태 업데이트
+        function updateOpponentSliderButtons() {
             const maxScroll = track.scrollWidth - slider.clientWidth;
-            currentScroll = Math.min(maxScroll, currentScroll + scrollAmount);
-            track.style.transform = `translateX(-${currentScroll}px)`;
-            updateOpponentSliderButtons();
-        });
+            if (prevBtn) prevBtn.disabled = currentScroll <= 0;
+            if (nextBtn) nextBtn.disabled = currentScroll >= maxScroll;
+        }
+        
+        // 초기 버튼 상태
+        updateOpponentSliderButtons();
     }
-    
-    // 버튼 상태 업데이트
-    function updateOpponentSliderButtons() {
-        const maxScroll = track.scrollWidth - slider.clientWidth;
-        if (prevBtn) prevBtn.disabled = currentScroll <= 0;
-        if (nextBtn) nextBtn.disabled = currentScroll >= maxScroll;
-    }
-    
-    // 초기 버튼 상태
-    updateOpponentSliderButtons();
     
     // 각 박스에 클릭 이벤트 추가
     boxes.forEach(box => {
@@ -527,16 +761,17 @@ function displayFormationDetail(opponentFormation) {
             
             <!-- 빠른 요약 박스 -->
             <div class="formation-quick-summary">
-                <div class="quick-summary-item summary-grade">
-                    <span class="quick-summary-icon">🏆</span>
-                    <span class="quick-summary-label">등급:</span>
-                    <span class="quick-summary-value grade-${quickSummary.gradeClass}">${quickSummary.grade}</span>
-                </div>
-                <div class="quick-summary-divider"></div>
-                
-                <div class="quick-summary-item summary-trend">
-                    <span class="quick-summary-icon">${quickSummary.trendIcon}</span>
-                    <span class="quick-summary-value trend-${quickSummary.trendClass}">${quickSummary.trend}</span>
+                <div class="quick-summary-grade-trend">
+                    <div class="quick-summary-item summary-grade">
+                        <span class="quick-summary-icon">🏆</span>
+                        <span class="quick-summary-label">등급:</span>
+                        <span class="quick-summary-value grade-${quickSummary.gradeClass}">${quickSummary.grade}</span>
+                    </div>
+                    
+                    <div class="quick-summary-item summary-trend">
+                        <span class="quick-summary-icon">${quickSummary.trendIcon}</span>
+                        <span class="quick-summary-value trend-${quickSummary.trendClass}">${quickSummary.trend}</span>
+                    </div>
                 </div>
                 <div class="quick-summary-divider"></div>
                 
@@ -872,16 +1107,29 @@ function generateQuickSummary(stats, matches, analysis) {
         const formationMatch = counterFormationFeedback.match(/<strong>([^<]+)<\/strong>/);
         if (formationMatch && formationMatch[1]) {
             const recommendedFormation = formationMatch[1];
-            const winRateMatch = counterFormationFeedback.match(/승률이.*?(\d+)%p/);
-            const currentWinRateMatch = counterFormationFeedback.match(/현재\s+(\d+)%/);
-            const bestWinRateMatch = counterFormationFeedback.match(/→\s+(\d+)%/);
             
-            if (winRateMatch && currentWinRateMatch && bestWinRateMatch) {
-                action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경하면 승률이 ${winRateMatch[1]}%p 더 높아집니다 (현재 ${currentWinRateMatch[1]}% → ${bestWinRateMatch[1]}%)`;
-            } else if (winRateMatch) {
-                action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경하면 승률이 ${winRateMatch[1]}%p 더 높아집니다`;
+            // 현재 사용 중인 포메이션 확인
+            const currentFormationMatches = matches || [];
+            const currentFormation = currentFormationMatches.length > 0 
+                ? (currentFormationMatches[0].formation || calculateFormationFromPlayers(currentFormationMatches[0].userPlayers || []))
+                : null;
+            
+            // 현재 포메이션과 추천 포메이션이 다른 경우에만 변경 제안
+            if (recommendedFormation !== currentFormation) {
+                const winRateMatch = counterFormationFeedback.match(/승률이.*?(\d+)%p/);
+                const currentWinRateMatch = counterFormationFeedback.match(/현재\s+(\d+)%/);
+                const bestWinRateMatch = counterFormationFeedback.match(/→\s+(\d+)%/);
+                
+                if (winRateMatch && currentWinRateMatch && bestWinRateMatch) {
+                    action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경하면 승률이 ${winRateMatch[1]}%p 더 높아집니다 (현재 ${currentWinRateMatch[1]}% → ${bestWinRateMatch[1]}%)`;
+                } else if (winRateMatch) {
+                    action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경하면 승률이 ${winRateMatch[1]}%p 더 높아집니다`;
+                } else {
+                    action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경을 고려해보세요`;
+                }
             } else {
-                action = `<strong>${recommendedFormation}</strong> 포메이션으로 변경을 고려해보세요`;
+                // 현재 포메이션이 최적인 경우
+                action = '현재 포메이션이 최적입니다. 계속 사용하세요';
             }
         }
     } else if (winRate < 40) {
@@ -2164,6 +2412,21 @@ function showFormationLoading(message = '포메이션 데이터 분석 중...') 
 function hideFormationLoading() {
     if (formationLoading) formationLoading.style.display = 'none';
     if (formationLayout) formationLayout.style.display = 'flex';
+    
+    // 포메이션 섹션 헤더 가운데 정렬 적용
+    setTimeout(() => {
+        const sectionHeaders = document.querySelectorAll('.formation-performance-section .section-header h3, .formation-groups-section .section-header h3');
+        sectionHeaders.forEach(header => {
+            header.style.textAlign = 'center';
+            header.style.width = '100%';
+        });
+        
+        const sectionDescriptions = document.querySelectorAll('.formation-performance-section .section-description, .formation-groups-section .section-description');
+        sectionDescriptions.forEach(description => {
+            description.style.textAlign = 'center';
+            description.style.width = '100%';
+        });
+    }, 100);
 }
 
 // 포메이션 데이터 없음 표시
@@ -2179,8 +2442,235 @@ function showNoFormationData() {
     }
 }
 
+// 스크롤 잠금 해제
+function unlockScroll() {
+    // body의 fixed 해제
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    document.body.classList.remove('modal-open');
+    
+    // 저장된 스크롤 위치로 복원
+    if (window.savedScrollPosition !== undefined) {
+        window.scrollTo(0, window.savedScrollPosition);
+        window.savedScrollPosition = undefined;
+    }
+}
+
+// 계산 팝업 닫기
+function closeCalculationPopup() {
+    const popup = document.getElementById('calculationPopup');
+    if (popup) {
+        popup.style.display = 'none';
+        popup.style.visibility = 'hidden';
+        popup.style.opacity = '0';
+        unlockScroll();
+    }
+}
+
+// 팝업 오버레이 클릭으로 닫기
+function addPopupOverlayClickEvent() {
+    const popupOverlay = document.getElementById('calculationPopup');
+    if (popupOverlay) {
+        popupOverlay.addEventListener('click', (e) => {
+            if (e.target === popupOverlay) {
+                closeCalculationPopup();
+            }
+        });
+    }
+}
+
 // DOM이 로드된 후 초기화
 document.addEventListener('DOMContentLoaded', function() {
     // 팝업 오버레이 클릭 이벤트 추가
     addPopupOverlayClickEvent();
 });
+
+// 화면 크기 변경 시 포메이션 슬라이더 재초기화
+let formationResizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(formationResizeTimeout);
+    formationResizeTimeout = setTimeout(() => {
+        // 포메이션 데이터가 있으면 재초기화
+        if (window.currentFormationPerformances && window.currentFormationPerformances.length > 0) {
+            // 기존 슬라이드 완전히 제거
+            if (formationPerformanceTrack) {
+                formationPerformanceTrack.innerHTML = '';
+            }
+            
+            // 기존 모바일 요소 제거
+            const existingIndicators = document.querySelector('.formation-performance-indicators');
+            const existingHint = document.querySelector('.formation-swipe-hint');
+            if (existingIndicators) existingIndicators.remove();
+            if (existingHint) existingHint.remove();
+            
+            // 화면 크기에 따라 적절한 방식으로 재생성
+            displayFormationPerformances(window.currentFormationPerformances);
+        }
+        
+        // 상대방 포메이션 슬라이더도 재초기화
+        if (window.currentOpponentFormations && window.currentOpponentFormations.length > 0) {
+            initOpponentFormationSlider();
+        }
+    }, 300);
+});
+
+// 모바일 상대방 포메이션 슬라이더 설정
+function setupMobileOpponentFormationSlider(boxes) {
+    const sliderContainer = document.querySelector('.opponent-formation-slider-container');
+    if (!sliderContainer) return;
+    
+    // 기존 모바일 기능 제거
+    const existingIndicators = sliderContainer.querySelector('.opponent-formation-indicators');
+    const existingHint = sliderContainer.querySelector('.opponent-swipe-hint');
+    if (existingIndicators) existingIndicators.remove();
+    if (existingHint) existingHint.remove();
+    
+    // 모바일용 인디케이터와 스와이프 기능 추가
+    createOpponentFormationIndicators(boxes);
+    setupOpponentFormationSwipe();
+    setupOpponentFormationScrollListener();
+}
+
+// 상대방 포메이션 인디케이터 생성
+function createOpponentFormationIndicators(boxes) {
+    const sliderContainer = document.querySelector('.opponent-formation-slider-container');
+    if (!sliderContainer) return;
+    
+    // 인디케이터 컨테이너 생성
+    const indicatorsContainer = document.createElement('div');
+    indicatorsContainer.className = 'opponent-formation-indicators';
+    
+    // 인디케이터 도트 생성
+    boxes.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.className = 'opponent-indicator-dot';
+        if (index === 0) dot.classList.add('active');
+        
+        dot.addEventListener('click', () => {
+            scrollToOpponentFormationSlide(index);
+        });
+        
+        indicatorsContainer.appendChild(dot);
+    });
+    
+    // 스와이프 힌트 추가
+    const swipeHint = document.createElement('div');
+    swipeHint.className = 'opponent-swipe-hint';
+    swipeHint.textContent = '← 좌우로 스와이프하여 상대 포메이션을 확인하세요 →';
+    
+    // 슬라이더 컨테이너에 추가
+    sliderContainer.appendChild(indicatorsContainer);
+    sliderContainer.appendChild(swipeHint);
+}
+
+// 상대방 포메이션 슬라이드로 스크롤
+function scrollToOpponentFormationSlide(index) {
+    const track = document.getElementById('opponentFormationTrack');
+    if (!track) return;
+    
+    const slideWidth = track.offsetWidth;
+    const scrollPosition = index * slideWidth;
+    
+    track.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+    });
+    
+    updateOpponentFormationIndicators();
+}
+
+// 상대방 포메이션 인디케이터 업데이트
+function updateOpponentFormationIndicators() {
+    const track = document.getElementById('opponentFormationTrack');
+    if (!track) return;
+    
+    const indicators = document.querySelectorAll('.opponent-indicator-dot');
+    if (indicators.length === 0) return;
+    
+    const slideWidth = track.offsetWidth;
+    const currentIndex = Math.round(track.scrollLeft / slideWidth);
+    
+    indicators.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
+    });
+}
+
+// 상대방 포메이션 스와이프 설정
+function setupOpponentFormationSwipe() {
+    const track = document.getElementById('opponentFormationTrack');
+    if (!track) return;
+    
+    let startX = 0;
+    let startY = 0;
+    let isScrolling = false;
+    let startTime = 0;
+    
+    track.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = Date.now();
+        isScrolling = false;
+    }, { passive: true });
+    
+    track.addEventListener('touchmove', (e) => {
+        if (!e.cancelable) return;
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = Math.abs(currentX - startX);
+        const diffY = Math.abs(currentY - startY);
+        
+        // 수직 스크롤이 더 크면 기본 동작 허용
+        if (diffY > diffX) {
+            return;
+        }
+        
+        // 수평 스크롤이 더 크면 기본 동작 방지
+        if (diffX > 5) { // 최소 스와이프 거리 설정
+            e.preventDefault();
+            isScrolling = true;
+        }
+    }, { passive: false });
+    
+    track.addEventListener('touchend', (e) => {
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        
+        if (isScrolling && duration < 500) { // 빠른 스와이프만 처리
+            const endX = e.changedTouches[0].clientX;
+            const diffX = endX - startX;
+            const slideWidth = track.offsetWidth;
+            
+            if (Math.abs(diffX) > slideWidth * 0.15) { // 15% 이상 스와이프 시 슬라이드 이동
+                const currentScroll = track.scrollLeft;
+                const targetScroll = diffX > 0 ? 
+                    currentScroll - slideWidth : 
+                    currentScroll + slideWidth;
+                
+                track.scrollTo({
+                    left: targetScroll,
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        if (isScrolling) {
+            updateOpponentFormationIndicators();
+        }
+    }, { passive: true });
+}
+
+// 상대방 포메이션 스크롤 리스너 설정
+function setupOpponentFormationScrollListener() {
+    const track = document.getElementById('opponentFormationTrack');
+    if (!track) return;
+    
+    let scrollTimeout;
+    track.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            updateOpponentFormationIndicators();
+        }, 100);
+    });
+}

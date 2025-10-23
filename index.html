@@ -12,8 +12,9 @@
     </script>
     
     <meta charset="UTF-8">
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-    <meta name="viewport" content="width=1200, initial-scale=0.5, user-scalable=yes">
+    <!-- Desktop keeps fixed width; mobile UA will override below -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="viewport" content="width=1200, initial-scale=0.5, user-scalable=yes"> -->
     <title>FC Data - FC온라인 전적 분석 | 구단별 포메이션 통계</title>
     
     <!-- SEO 최적화 -->
@@ -42,6 +43,8 @@
     <link rel="stylesheet" href="css/formation.css">
     <!-- Rival Match Styles -->
     <link rel="stylesheet" href="css/rival.css">
+    <!-- Mobile-only overrides -->
+    <link rel="stylesheet" href="css/mobile.css" media="(max-width: 1024px)">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,7 +53,18 @@
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8530704724833439"
          crossorigin="anonymous"></script>
-</head>
+    <script>
+      (function() {
+        var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (!isMobile) return;
+        var meta = document.querySelector('meta[name="viewport"]');
+        if (meta) {
+          meta.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover');
+        }
+        document.documentElement.classList.add('is-mobile');
+      })();
+    </script>
+  </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TMBJCM9Z"
@@ -265,7 +279,13 @@
                     <div class="matches-compact">
                         <div class="matches-header">
                             <h3>최근 경기 기록 <span id="matchCount" class="match-count">(0)</span></h3>
-                            <button class="load-more-btn" id="loadMoreBtn">더보기</button>
+                            <div class="matches-controls">
+                <select id="matchCountSelect" class="match-count-select">
+                    <option value="10">10경기</option>
+                    <option value="max">최대 경기</option>
+                </select>
+                                <button class="load-more-btn" id="loadMoreBtn">더보기</button>
+                            </div>
                         </div>
                         <div class="matches-list" id="matchesList">
                             <!-- 경기 기록이 여기에 표시됩니다 -->
@@ -381,6 +401,8 @@
                             <div class="formation-performance-section" id="formationPerformanceSection">
                                 <div class="section-header">
                                     <h3>📊 포메이션별 경기 성과</h3>
+                                </div>
+                                <div class="section-description">
                                     <p class="section-subtitle">각 포메이션의 전체 성과를 확인하세요</p>
                                 </div>
                                 
@@ -409,6 +431,8 @@
                             <div class="formation-groups-section" id="formationGroupsSection">
                                 <div class="section-header">                            
                                     <h3>⚽ 포메이션별 상세 그룹</h3>
+                                </div>
+                                <div class="section-description">
                                     <p class="section-subtitle">동일한 포메이션을 사용한 경기들의 상세 데이터</p>
                                 </div>
                                 <div class="formation-groups-container" id="formationGroupsContainer">
@@ -431,6 +455,30 @@
                 <div id="rival-container"></div>
             </div>
         </div>
+
+        <!-- 모바일 하단 탭 바 -->
+        <nav class="mobile-tabbar" id="mobileTabbar" aria-label="모바일 내비게이션" style="display:none;">
+            <button class="mobile-tabitem" data-tab="search" aria-label="검색">
+                <span class="mobile-tabicon">🔎</span>
+                <span class="mobile-tabtext">검색</span>
+            </button>
+            <button class="mobile-tabitem active" data-tab="dashboard" aria-label="대시보드">
+                <span class="mobile-tabicon">🏠</span>
+                <span class="mobile-tabtext">대시보드</span>
+            </button>
+            <button class="mobile-tabitem" data-tab="team" aria-label="구단">
+                <span class="mobile-tabicon">👥</span>
+                <span class="mobile-tabtext">구단</span>
+            </button>
+            <button class="mobile-tabitem" data-tab="stats" aria-label="포메이션">
+                <span class="mobile-tabicon">📊</span>
+                <span class="mobile-tabtext">포메이션</span>
+            </button>
+            <button class="mobile-tabitem" data-tab="rival" id="mobileRivalTabBtn" aria-label="라이벌" style="display:none;">
+                <span class="mobile-tabicon">⚔️</span>
+                <span class="mobile-tabtext">라이벌</span>
+            </button>
+        </nav>
 
         <!-- 에러 섹션 -->
         <div class="error-section" id="errorSection" style="display: none;">
@@ -576,6 +624,33 @@
     <footer style="text-align: center; padding: 2rem 1rem; margin-top: 3rem; color: #666; font-size: 0.875rem;">
         Data based on NEXON Open API
     </footer>
+
+    <!-- 모바일 검색 팝업 -->
+    <div class="mobile-search-popup-overlay" id="mobileSearchPopup" style="display: none;">
+        <div class="mobile-search-popup">
+            <div class="popup-header">
+                <h3>🔎 닉네임 검색</h3>
+                <button class="popup-close" id="closeMobileSearchBtn" aria-label="닫기">&times;</button>
+            </div>
+            <div class="popup-content">
+                <div class="mobile-search-form">
+                    <select id="mobileMatchTypeSelect" class="match-type-select">
+                        <option value="50">공식경기</option>
+                        <option value="52">감독모드</option>
+                        <option value="60">친선경기</option>
+                    </select>
+                    <input type="text" id="mobileNicknameInput" placeholder="유저 닉네임을 입력하세요" maxlength="20" autocomplete="off">
+                    <div class="mobile-search-actions">
+                        <button class="confirm-search-btn" id="confirmMobileSearchBtn">검색</button>
+                    </div>
+                </div>
+                <div class="popup-loading" id="mobilePopupLoading" style="display: none;">
+                    <div class="spinner"></div>
+                    <span>로딩 중...</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 맨 위로 가기 버튼 -->
     <button id="scrollToTopBtn" class="scroll-to-top" aria-label="맨 위로 가기">

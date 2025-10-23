@@ -378,41 +378,76 @@ function calculateFormationStats(matches) {
 // 구단별 포메이션 카드 표시
 function displayTeamFormationCards(formations) {
     
+    // 전역 변수에 저장 (리사이즈 시 재초기화용)
+    window.currentTeamFormations = formations;
+    
     // 슬라이더 초기화
     if (teamCardsTrack) {
         teamCardsTrack.innerHTML = '';
     }
     
-    // 슬라이더 변수 초기화
-    currentSlideIndex = 0;
-    totalSlides = Math.ceil(formations.length / cardsPerSlide);
+    // 모바일 감지
+    const isMobile = window.innerWidth <= 1024;
     
-    // 슬라이드별로 카드 그룹화
-    for (let slideIndex = 0; slideIndex < totalSlides; slideIndex++) {
-        const slide = document.createElement('div');
-        slide.className = 'team-slide';
+    if (isMobile) {
+        // 모바일: 각 카드를 개별 슬라이드로 생성
+        currentSlideIndex = 0;
+        totalSlides = formations.length;
         
-        // 현재 슬라이드에 들어갈 카드들 (최대 2개)
-        const startIndex = slideIndex * cardsPerSlide;
-        const endIndex = Math.min(startIndex + cardsPerSlide, formations.length);
-        
-        for (let i = startIndex; i < endIndex; i++) {
-            const formation = formations[i];
-            formation.formationId = i;
-            const card = createTeamFormationCard(formation, i);
+        formations.forEach((formation, index) => {
+            formation.formationId = index;
+            const slide = document.createElement('div');
+            slide.className = 'team-slide';
+            
+            const card = createTeamFormationCard(formation, index);
             slide.appendChild(card);
+            
+            if (teamCardsTrack) {
+                teamCardsTrack.appendChild(slide);
+            }
+        });
+        
+        // 모바일용 인디케이터 생성
+        createTeamCardsIndicators(formations);
+        
+        // 모바일용 스와이프 이벤트 추가
+        setupTeamCardsSwipe();
+        
+        // 스크롤 이벤트 추가
+        setupTeamCardsScrollListener();
+        
+    } else {
+        // 데스크탑: 기존 방식 (2개씩 그룹화)
+        currentSlideIndex = 0;
+        totalSlides = Math.ceil(formations.length / cardsPerSlide);
+        
+        // 슬라이드별로 카드 그룹화
+        for (let slideIndex = 0; slideIndex < totalSlides; slideIndex++) {
+            const slide = document.createElement('div');
+            slide.className = 'team-slide';
+            
+            // 현재 슬라이드에 들어갈 카드들 (최대 2개)
+            const startIndex = slideIndex * cardsPerSlide;
+            const endIndex = Math.min(startIndex + cardsPerSlide, formations.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const formation = formations[i];
+                formation.formationId = i;
+                const card = createTeamFormationCard(formation, i);
+                slide.appendChild(card);
+            }
+            
+            if (teamCardsTrack) {
+                teamCardsTrack.appendChild(slide);
+            }
         }
         
-        if (teamCardsTrack) {
-            teamCardsTrack.appendChild(slide);
-        }
+        // 슬라이더 버튼 상태 업데이트
+        updateSliderButtons();
+        
+        // 슬라이더 이벤트 리스너 추가
+        setupSliderEventListeners();
     }
-    
-    // 슬라이더 버튼 상태 업데이트
-    updateSliderButtons();
-    
-    // 슬라이더 이벤트 리스너 추가
-    setupSliderEventListeners();
     
     hideTeamLoading();
     const teamLayout = document.getElementById('teamLayout');
@@ -432,6 +467,156 @@ function displayTeamFormationCards(formations) {
         teamCardGuide.style.display = 'none';
     }
     
+}
+
+// 모바일용 구단 카드 인디케이터 생성
+function createTeamCardsIndicators(formations) {
+    const teamCardsContainer = document.querySelector('.team-cards-slider-container');
+    if (!teamCardsContainer) return;
+    
+    // 기존 인디케이터 제거
+    const existingIndicators = teamCardsContainer.querySelector('.team-cards-indicators');
+    const existingHint = teamCardsContainer.querySelector('.team-swipe-hint');
+    
+    if (existingIndicators) existingIndicators.remove();
+    if (existingHint) existingHint.remove();
+    
+    // 인디케이터 컨테이너 생성
+    const indicatorsContainer = document.createElement('div');
+    indicatorsContainer.className = 'team-cards-indicators';
+    
+    // 스와이프 힌트 생성
+    const swipeHint = document.createElement('div');
+    swipeHint.className = 'team-swipe-hint';
+    swipeHint.textContent = '좌우로 스와이프하여 구단 카드를 확인하세요';
+    
+    // 각 구단에 대한 인디케이터 도트 생성
+    formations.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.className = 'team-indicator-dot';
+        if (index === 0) dot.classList.add('active');
+        
+        dot.addEventListener('click', () => {
+            currentSlideIndex = index;
+            updateTeamCardsSliderPosition();
+            updateTeamCardsIndicators();
+        });
+        
+        indicatorsContainer.appendChild(dot);
+    });
+    
+    // teamCardsContainer에 추가
+    teamCardsContainer.appendChild(indicatorsContainer);
+    teamCardsContainer.appendChild(swipeHint);
+    
+    // 3초 후 힌트 숨기기
+    setTimeout(() => {
+        if (swipeHint) {
+            swipeHint.style.opacity = '0';
+            setTimeout(() => {
+                if (swipeHint.parentNode) {
+                    swipeHint.parentNode.removeChild(swipeHint);
+                }
+            }, 1000);
+        }
+    }, 3000);
+}
+
+// 구단 카드 인디케이터 업데이트
+function updateTeamCardsIndicators() {
+    const dots = document.querySelectorAll('.team-indicator-dot');
+    dots.forEach((dot, index) => {
+        if (index === currentSlideIndex) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+}
+
+// 구단 카드 슬라이더 위치 업데이트
+function updateTeamCardsSliderPosition() {
+    if (!teamCardsTrack) return;
+    
+    const slideWidth = teamCardsTrack.offsetWidth;
+    const scrollLeft = currentSlideIndex * slideWidth;
+    teamCardsTrack.scrollLeft = scrollLeft;
+}
+
+// 모바일용 구단 카드 스와이프 설정
+function setupTeamCardsSwipe() {
+    if (!teamCardsTrack) return;
+    
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+    
+    teamCardsTrack.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isDragging = true;
+    });
+    
+    teamCardsTrack.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = startX - currentX;
+        const diffY = startY - currentY;
+        
+        // 수평 스와이프인지 확인하고 preventDefault 가능한 경우에만 호출
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            // preventDefault가 가능한 경우에만 호출
+            if (e.cancelable) {
+                e.preventDefault();
+            }
+        }
+    }, { passive: false });
+    
+    teamCardsTrack.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        
+        const endX = e.changedTouches[0].clientX;
+        const diffX = startX - endX;
+        const threshold = 50;
+        
+        if (Math.abs(diffX) > threshold) {
+            if (diffX > 0 && currentSlideIndex < totalSlides - 1) {
+                // 오른쪽으로 스와이프 (다음 슬라이드)
+                currentSlideIndex++;
+            } else if (diffX < 0 && currentSlideIndex > 0) {
+                // 왼쪽으로 스와이프 (이전 슬라이드)
+                currentSlideIndex--;
+            }
+            
+            updateTeamCardsSliderPosition();
+            updateTeamCardsIndicators();
+        }
+        
+        isDragging = false;
+    });
+}
+
+// 구단 카드 스크롤 리스너 설정
+function setupTeamCardsScrollListener() {
+    if (!teamCardsTrack) return;
+    
+    let scrollTimeout;
+    
+    teamCardsTrack.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const slideWidth = teamCardsTrack.offsetWidth;
+            const scrollLeft = teamCardsTrack.scrollLeft;
+            const newIndex = Math.round(scrollLeft / slideWidth);
+            
+            if (newIndex !== currentSlideIndex && newIndex >= 0 && newIndex < totalSlides) {
+                currentSlideIndex = newIndex;
+                updateTeamCardsIndicators();
+            }
+        }, 100);
+    });
 }
 
 // 포메이션 카드 생성 (간소화)
@@ -1686,6 +1871,9 @@ function displayTeamTopPlayers(matches) {
         }
     ];
     
+    // 슬라이드 데이터를 전역 변수에 저장 (리사이즈 이벤트용)
+    window.currentTopPlayersSlides = slides;
+    
     // 슬라이더 상태 초기화
     topPlayersCurrentSlideIndex = 0;
     topPlayersTotalSlides = slides.length;
@@ -1707,7 +1895,7 @@ function displayTeamTopPlayers(matches) {
     
 }
 
-// 최고의 선수 슬라이더 생성
+// 최고의 선수 슬라이더 생성 - 모바일 최적화
 function createTopPlayersSlider(slides) {
     const track = document.getElementById('topPlayersTrack');
     if (!track) return;
@@ -1715,64 +1903,128 @@ function createTopPlayersSlider(slides) {
     // 기존 내용 초기화
     track.innerHTML = '';
     
-    // 슬라이드 생성 (4개씩 그룹화)
-    const slidesPerView = 4;
-    topPlayersTotalSlides = Math.ceil(slides.length / slidesPerView);
-    topPlayersCurrentSlideIndex = 0;
+    // 모바일 감지
+    const isMobile = window.innerWidth <= 1024;
     
-    // 슬라이더 트랙 위치 초기화
-    track.style.transform = 'translateX(0%)';
-    
-    for (let i = 0; i < topPlayersTotalSlides; i++) {
-        const slideElement = document.createElement('div');
-        slideElement.className = 'top-players-slide';
+    if (isMobile) {
+        // 모바일: 모든 카테고리를 개별 슬라이드로 생성
+        topPlayersTotalSlides = slides.length;
+        topPlayersCurrentSlideIndex = 0;
         
-        const startIndex = i * slidesPerView;
-        const endIndex = Math.min(startIndex + slidesPerView, slides.length);
-        const slideData = slides.slice(startIndex, endIndex);
+        // 슬라이더 트랙 위치 초기화
+        track.style.transform = 'translateX(0%)';
         
-        slideElement.innerHTML = slideData.map(slide => `
-            <div class="top-player-category">
-                <h5>${slide.title}</h5>
-                <div class="top-players-list">
-                            ${slide.players.map((player, index) => {
-                                if (index === 0) {
-                                    // 1등 - 사진 표시
-                                    return `
-                                        <div class="top-player-item first-place">
-                                            <img src="https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p${player.spId || 'default'}.png" 
-                                                 alt="${player.name}" 
-                                                 class="player-image" 
-                                                 onerror="this.src='https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p100000000.png'">
-                                            <div class="player-info">
-                                                ${player.season?.seasonImg ? `<img src="${player.season.seasonImg}" alt="시즌" class="season-badge" onerror="this.style.display='none'"/>` : ''}
-                                                <div class="player-name">${player.name}</div>
-                                            </div>
-                                            <div class="player-stats">${player.stats}</div>
+        slides.forEach((slide, index) => {
+            const slideElement = document.createElement('div');
+            slideElement.className = 'top-players-slide';
+            
+            
+            slideElement.innerHTML = `
+                <div class="top-player-category">
+                    <h5>${slide.title}</h5>
+                    <div class="top-players-list">
+                        ${slide.players.map((player, index) => {
+                            if (index === 0) {
+                                // 1등 - 골드 스타일
+                                return `
+                                    <div class="top-player-item first-place">
+                                        <img src="https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p${player.spId || 'default'}.png" 
+                                             alt="${player.name}" 
+                                             class="player-image" 
+                                             onerror="this.src='https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p100000000.png'">
+                                        <div class="player-info">
+                                            ${player.season?.seasonImg ? `<img src="${player.season.seasonImg}" alt="시즌" class="season-badge" onerror="this.style.display='none'"/>` : ''}
+                                            <div class="player-name">${player.name}</div>
                                         </div>
-                                    `;
-                                } else {
-                                    // 2-4등 - 시즌이미지+이름 (순위 텍스트 제거)
-                                    return `
-                                        <div class="top-player-item">
-                                            <div class="player-info">
-                                                ${player.season?.seasonImg ? `<img src="${player.season.seasonImg}" alt="시즌" class="season-badge" onerror="this.style.display='none'"/>` : ''}
-                                                <div class="player-name">${player.name}</div>
-                                            </div>
-                                            <div class="player-stats">${player.stats}</div>
+                                        <div class="player-stats">${player.stats}</div>
+                                    </div>
+                                `;
+                            } else {
+                                // 2-4등 - 일반 스타일
+                                return `
+                                    <div class="top-player-item">
+                                        <div class="player-info">
+                                            ${player.season?.seasonImg ? `<img src="${player.season.seasonImg}" alt="시즌" class="season-badge" onerror="this.style.display='none'"/>` : ''}
+                                            <div class="player-name">${player.name}</div>
                                         </div>
-                                    `;
-                                }
-                            }).join('')}
+                                        <div class="player-stats">${player.stats}</div>
+                                    </div>
+                                `;
+                            }
+                        }).join('')}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+            
+            track.appendChild(slideElement);
+            
+        });
         
-        track.appendChild(slideElement);
+    } else {
+        // 데스크탑: 기존 방식 (4개씩 그룹화)
+        const slidesPerView = 4;
+        topPlayersTotalSlides = Math.ceil(slides.length / slidesPerView);
+        topPlayersCurrentSlideIndex = 0;
+        
+        // 슬라이더 트랙 위치 초기화
+        track.style.transform = 'translateX(0%)';
+        
+        for (let i = 0; i < topPlayersTotalSlides; i++) {
+            const slideElement = document.createElement('div');
+            slideElement.className = 'top-players-slide';
+            
+            const startIndex = i * slidesPerView;
+            const endIndex = Math.min(startIndex + slidesPerView, slides.length);
+            const slideData = slides.slice(startIndex, endIndex);
+            
+            slideElement.innerHTML = slideData.map(slide => `
+                <div class="top-player-category">
+                    <h5>${slide.title}</h5>
+                    <div class="top-players-list">
+                        ${slide.players.map((player, index) => {
+                            if (index === 0) {
+                                // 1등 - 사진 표시
+                                return `
+                                    <div class="top-player-item first-place">
+                                        <img src="https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p${player.spId || 'default'}.png" 
+                                             alt="${player.name}" 
+                                             class="player-image" 
+                                             onerror="this.src='https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p100000000.png'">
+                                        <div class="player-info">
+                                            ${player.season?.seasonImg ? `<img src="${player.season.seasonImg}" alt="시즌" class="season-badge" onerror="this.style.display='none'"/>` : ''}
+                                            <div class="player-name">${player.name}</div>
+                                        </div>
+                                        <div class="player-stats">${player.stats}</div>
+                                    </div>
+                                `;
+                            } else {
+                                // 2-4등 - 시즌이미지+이름 (순위 텍스트 제거)
+                                return `
+                                    <div class="top-player-item">
+                                        <div class="player-info">
+                                            ${player.season?.seasonImg ? `<img src="${player.season.seasonImg}" alt="시즌" class="season-badge" onerror="this.style.display='none'"/>` : ''}
+                                            <div class="player-name">${player.name}</div>
+                                        </div>
+                                        <div class="player-stats">${player.stats}</div>
+                                    </div>
+                                `;
+                            }
+                        }).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            track.appendChild(slideElement);
+        }
     }
     
     // 슬라이더 이벤트 리스너 설정
     setupTopPlayersSlider();
+    
+    // 모바일용 인디케이터와 카운터 생성
+    if (isMobile) {
+        createTopPlayersIndicators();
+    }
     
     // 슬라이더 버튼 상태 초기화 및 표시
     const prevBtn = document.getElementById('topPlayersPrevBtn');
@@ -1780,11 +2032,13 @@ function createTopPlayersSlider(slides) {
     
     if (prevBtn) {
         prevBtn.disabled = true;
-        prevBtn.style.display = topPlayersTotalSlides > 1 ? 'flex' : 'none';
+        // 모바일에서는 버튼을 숨기고, 데스크탑에서만 표시
+        prevBtn.style.display = (isMobile ? 'none' : (topPlayersTotalSlides > 1 ? 'flex' : 'none'));
     }
     if (nextBtn) {
         nextBtn.disabled = topPlayersTotalSlides <= 1;
-        nextBtn.style.display = topPlayersTotalSlides > 1 ? 'flex' : 'none';
+        // 모바일에서는 버튼을 숨기고, 데스크탑에서만 표시
+        nextBtn.style.display = (isMobile ? 'none' : (topPlayersTotalSlides > 1 ? 'flex' : 'none'));
     }
 }
 
@@ -1792,9 +2046,27 @@ function createTopPlayersSlider(slides) {
 function setupTopPlayersSlider() {
     const prevBtn = document.getElementById('topPlayersPrevBtn');
     const nextBtn = document.getElementById('topPlayersNextBtn');
+    const track = document.getElementById('topPlayersTrack');
     
+    // 기존 이벤트 리스너 제거 (중복 방지)
     if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
+        prevBtn.replaceWith(prevBtn.cloneNode(true));
+    }
+    if (nextBtn) {
+        nextBtn.replaceWith(nextBtn.cloneNode(true));
+    }
+    if (track) {
+        track.replaceWith(track.cloneNode(true));
+    }
+    
+    // 새로운 요소 참조 가져오기
+    const newPrevBtn = document.getElementById('topPlayersPrevBtn');
+    const newNextBtn = document.getElementById('topPlayersNextBtn');
+    const newTrack = document.getElementById('topPlayersTrack');
+    
+    // 데스크탑 버튼 이벤트
+    if (newPrevBtn) {
+        newPrevBtn.addEventListener('click', () => {
             if (topPlayersCurrentSlideIndex > 0) {
                 topPlayersCurrentSlideIndex--;
                 updateTopPlayersSliderPosition();
@@ -1803,8 +2075,8 @@ function setupTopPlayersSlider() {
         });
     }
     
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
+    if (newNextBtn) {
+        newNextBtn.addEventListener('click', () => {
             if (topPlayersCurrentSlideIndex < topPlayersTotalSlides - 1) {
                 topPlayersCurrentSlideIndex++;
                 updateTopPlayersSliderPosition();
@@ -1813,8 +2085,171 @@ function setupTopPlayersSlider() {
         });
     }
     
+    // 모바일 터치 스와이프 이벤트
+    if (newTrack && window.innerWidth <= 1024) {
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        
+        newTrack.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+        });
+        
+        newTrack.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = startX - currentX;
+            const diffY = startY - currentY;
+            
+            // 수직 스크롤보다 수평 스와이프가 더 크면 기본 동작 방지
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                e.preventDefault();
+            }
+        });
+        
+        newTrack.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const diffX = startX - endX;
+            const minSwipeDistance = 50; // 최소 스와이프 거리
+            
+            if (Math.abs(diffX) > minSwipeDistance) {
+                if (diffX > 0) {
+                    // 왼쪽으로 스와이프 - 다음 슬라이드
+                    if (topPlayersCurrentSlideIndex < topPlayersTotalSlides - 1) {
+                        topPlayersCurrentSlideIndex++;
+                        updateTopPlayersSliderPosition();
+                        updateTopPlayersSliderButtons();
+                    }
+                } else {
+                    // 오른쪽으로 스와이프 - 이전 슬라이드
+                    if (topPlayersCurrentSlideIndex > 0) {
+                        topPlayersCurrentSlideIndex--;
+                        updateTopPlayersSliderPosition();
+                        updateTopPlayersSliderButtons();
+                    }
+                }
+            }
+            
+            isDragging = false;
+        });
+    }
+    
     // 초기 버튼 상태 설정
     updateTopPlayersSliderButtons();
+    
+    // 윈도우 리사이즈 이벤트 (화면 크기 변경 시 슬라이더 재초기화)
+    window.addEventListener('resize', () => {
+        // 디바운싱을 위해 300ms 지연
+        clearTimeout(window.topPlayersResizeTimeout);
+        window.topPlayersResizeTimeout = setTimeout(() => {
+            // 현재 슬라이드 데이터가 있는지 확인
+            const track = document.getElementById('topPlayersTrack');
+            if (track && track.children.length > 0) {
+                // 슬라이더를 다시 생성
+                const slides = window.currentTopPlayersSlides;
+                if (slides) {
+                    createTopPlayersSlider(slides);
+                }
+            }
+            
+            // 구단 카드 슬라이더도 재초기화
+            const teamTrack = document.getElementById('teamCardsTrack');
+            if (teamTrack && teamTrack.children.length > 0) {
+                const formations = window.currentTeamFormations;
+                if (formations) {
+                    displayTeamFormationCards(formations);
+                }
+            }
+        }, 300);
+    });
+}
+
+// 모바일용 인디케이터 도트와 카운터 생성
+function createTopPlayersIndicators() {
+    const topPlayersSection = document.getElementById('topPlayersSection');
+    if (!topPlayersSection) return;
+
+    // 슬라이드가 없으면 인디케이터를 생성하지 않음
+    if (topPlayersTotalSlides === 0) return;
+
+    // 기존 인디케이터 제거
+    const existingIndicators = topPlayersSection.querySelector('.top-players-indicators');
+    const existingHint = topPlayersSection.querySelector('.swipe-hint');
+
+    if (existingIndicators) existingIndicators.remove();
+    if (existingHint) existingHint.remove();
+
+    // 현재 슬라이드 인덱스가 총 슬라이드 수를 초과하면 리셋
+    if (topPlayersCurrentSlideIndex >= topPlayersTotalSlides) {
+        topPlayersCurrentSlideIndex = 0;
+    }
+
+    // 인디케이터 컨테이너 생성
+    const indicatorsContainer = document.createElement('div');
+    indicatorsContainer.className = 'top-players-indicators';
+    indicatorsContainer.id = 'topPlayersIndicators';
+
+    // 스와이프 힌트 생성
+    const swipeHint = document.createElement('div');
+    swipeHint.className = 'swipe-hint';
+    swipeHint.textContent = '좌우로 스와이프하여 더 보기';
+
+    // 도트 생성
+    for (let i = 0; i < topPlayersTotalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.className = `indicator-dot ${i === topPlayersCurrentSlideIndex ? 'active' : ''}`;
+        dot.dataset.slideIndex = i;
+
+        // 도트 클릭 이벤트
+        dot.addEventListener('click', () => {
+            topPlayersCurrentSlideIndex = i;
+            updateTopPlayersSliderPosition();
+            updateTopPlayersSliderButtons();
+            updateTopPlayersIndicators();
+        });
+
+        indicatorsContainer.appendChild(dot);
+    }
+
+    // top-players-section에 추가 (슬라이더 컨테이너 밖으로)
+    topPlayersSection.appendChild(indicatorsContainer);
+    topPlayersSection.appendChild(swipeHint);
+    
+    // 3초 후 힌트 숨기기
+    setTimeout(() => {
+        if (swipeHint) {
+            swipeHint.style.opacity = '0';
+            setTimeout(() => {
+                if (swipeHint.parentNode) {
+                    swipeHint.parentNode.removeChild(swipeHint);
+                }
+            }, 1000);
+        }
+    }, 3000);
+}
+
+// 인디케이터 업데이트
+function updateTopPlayersIndicators() {
+    // 최고의 선수 섹션의 indicator만 선택
+    const topPlayersSection = document.getElementById('topPlayersSection');
+    if (!topPlayersSection) return;
+
+    const indicators = topPlayersSection.querySelectorAll('.indicator-dot');
+
+    // 도트 상태 업데이트
+    indicators.forEach((dot, index) => {
+        if (index === topPlayersCurrentSlideIndex) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
 }
 
 // 최고의 선수 슬라이더 위치 업데이트
@@ -1825,6 +2260,11 @@ function updateTopPlayersSliderPosition() {
     const slideWidth = 100; // 100% per slide
     const translateX = -topPlayersCurrentSlideIndex * slideWidth;
     track.style.transform = `translateX(${translateX}%)`;
+    
+    // 모바일에서 인디케이터 업데이트
+    if (window.innerWidth <= 1024) {
+        updateTopPlayersIndicators();
+    }
 }
 
 // 최고의 선수 슬라이더 버튼 상태 업데이트

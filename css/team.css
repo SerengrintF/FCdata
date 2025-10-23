@@ -125,7 +125,8 @@
     min-width: 0;
 }
 
-.top-player-category {
+/* 구단 Tab 전용 top-player-category 스타일 */
+.top-players-section .top-player-category {
     text-align: center;
     padding: 16px;
     background: var(--bg-tertiary);
@@ -135,17 +136,41 @@
     min-width: 200px;
 }
 
-.top-player-category:hover {
+.top-players-section .top-player-category:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
     border-color: var(--border-accent);
 }
 
-.top-player-category h5 {
+.top-players-section .top-player-category h5 {
     margin: 0 0 12px 0;
     font-size: 14px;
     font-weight: 600;
     color: var(--text-accent);
+}
+
+/* 대시보드 주요선수 카드 전용 top-player-category 스타일 */
+.top-players-card .top-player-category {
+    text-align: center;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-normal);
+    min-width: 150px;
+}
+
+.top-players-card .top-player-category:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--border-accent);
+}
+
+.top-players-card .top-player-category h5 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .top-players-list {
@@ -1327,9 +1352,14 @@
             gap: 12px;
         }
         
-        .top-player-category {
+        .top-players-section .top-player-category {
             padding: 12px;
             min-width: 180px;
+        }
+        
+        .top-players-card .top-player-category {
+            padding: 10px;
+            min-width: 140px;
         }
         
         .player-name {
@@ -1381,9 +1411,14 @@
             grid-template-columns: repeat(2, 1fr); /* 2x2 on mobile */
         }
         
-        .top-player-category {
+        .top-players-section .top-player-category {
             min-width: 150px;
             padding: 10px;
+        }
+        
+        .top-players-card .top-player-category {
+            min-width: 120px;
+            padding: 8px;
         }
         
         .player-name {

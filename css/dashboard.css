@@ -451,6 +451,36 @@
     margin-bottom: 16px;
 }
 
+.matches-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.match-count-select {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 80px;
+}
+
+.match-count-select:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-secondary);
+}
+
+.match-count-select:focus {
+    outline: none;
+    border-color: var(--bg-accent);
+    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+}
+
 .matches-header h3 {
     margin: 0;
     color: var(--text-primary);
@@ -1351,6 +1381,7 @@
     .top-player-item {
         padding: 12px;
         gap: 8px;
+        width:100%;
     }
     
     .top-player-image {
@@ -3144,7 +3175,6 @@
     
     .user-value, .opponent-value {
         min-width: auto;
-        width: 100%;
     }
     
     .goal-types {

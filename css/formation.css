@@ -19,7 +19,7 @@
 }
 
 .section-header {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     text-align: center;
 }
 
@@ -27,7 +27,13 @@
     font-size: 20px;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 8px;
+    margin: 0;
+    text-align: center !important;
+}
+
+.section-description {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .section-subtitle {
@@ -1254,7 +1260,7 @@
     padding: 16px 20px;
     margin-bottom: 20px;
     gap: 16px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-fast);
 }
@@ -1347,6 +1353,52 @@
     width: 1px;
     height: 28px;
     background: linear-gradient(180deg, transparent 0%, var(--border-color) 20%, var(--border-color) 80%, transparent 100%);
+}
+
+/* 데스크톱에서 등급과 트렌드가 나란히 배치되도록 */
+@media (min-width: 1025px) {
+    .formation-quick-summary {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+    }
+    
+    .quick-summary-item.summary-grade {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    
+    .quick-summary-item.summary-trend {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    
+    .quick-summary-item.summary-stats {
+        flex: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+    
+    .quick-summary-item.summary-action {
+        flex: 2 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        min-width: 220px !important;
+    }
+    
+    .quick-summary-divider {
+        display: block !important;
+        width: 1px !important;
+        height: 28px !important;
+        background: linear-gradient(180deg, transparent 0%, var(--border-color) 20%, var(--border-color) 80%, transparent 100%) !important;
+    }
 }
 
 .summary-action {

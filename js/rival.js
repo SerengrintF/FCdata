@@ -801,19 +801,28 @@ class RivalMatchManager {
         const expandedSection = matchItem.querySelector('.match-details-expanded');
         const expandIcon = headerElement.querySelector('.expand-icon');
         
-        if (expandedSection.style.display === 'none' || expandedSection.style.display === '') {
-            // 확장
-            expandedSection.style.display = 'block';
-            expandIcon.textContent = '▲';
-            expandIcon.style.transform = 'rotate(180deg)';
-            
-            // 상세 정보 로드
-            this.loadRivalMatchDetails(matchItem);
+        // 모바일 감지 개선
+        const isMobile = window.innerWidth <= 1024 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            // 모바일에서는 카드 확장 대신 팝업 호출
+            this.openRivalMatchPopup(matchItem);
         } else {
-            // 축소
-            expandedSection.style.display = 'none';
-            expandIcon.textContent = '▼';
-            expandIcon.style.transform = 'rotate(0deg)';
+            // 데스크톱에서는 기존 방식
+            if (expandedSection.style.display === 'none' || expandedSection.style.display === '') {
+                // 확장
+                expandedSection.style.display = 'block';
+                expandIcon.textContent = '▲';
+                expandIcon.style.transform = 'rotate(180deg)';
+                
+                // 상세 정보 로드
+                this.loadRivalMatchDetails(matchItem);
+            } else {
+                // 축소
+                expandedSection.style.display = 'none';
+                expandIcon.textContent = '▼';
+                expandIcon.style.transform = 'rotate(0deg)';
+            }
         }
     }
 
@@ -845,6 +854,169 @@ class RivalMatchManager {
             </div>
         `;
     }
+    }
+
+    // 모바일 팝업 열기 함수 (대시보드의 openMatchPopup과 동일한 로직)
+    openRivalMatchPopup(matchItem) {
+        const matchData = JSON.parse(matchItem.getAttribute('data-match'));
+        
+        // 현재 스크롤 위치 저장
+        const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+        window.matchPopupScrollPosition = currentScrollPosition;
+        
+        // 기존 팝업이 있다면 제거
+        const existingPopup = document.getElementById('matchPopup');
+        if (existingPopup) {
+            existingPopup.remove();
+        }
+        
+        // 팝업 오버레이 생성
+        const popupOverlay = document.createElement('div');
+        popupOverlay.id = 'matchPopup';
+        popupOverlay.className = 'match-popup-overlay';
+        
+        // 팝업 콘텐츠 생성
+        const popupContent = document.createElement('div');
+        popupContent.className = 'match-popup-content';
+        
+        // 닫기 버튼 생성
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'match-popup-close-btn';
+        closeBtn.innerHTML = '×';
+        closeBtn.setAttribute('aria-label', '팝업 닫기');
+        closeBtn.onclick = this.closeRivalMatchPopup;
+        
+        // 팝업 헤더 생성 (경기 정보)
+        const popupHeader = document.createElement('div');
+        popupHeader.className = 'match-popup-header';
+        
+        const result = matchData.matchResult || 0;
+        const resultText = result === 1 ? '승' : result === 2 ? '패' : '무';
+        const resultClass = result === 1 ? 'win' : result === 2 ? 'lose' : 'draw';
+        const goals = matchData.userGoals || 0;
+        const conceded = matchData.opponentGoals || 0;
+        const score = `${goals} - ${conceded}`;
+        const opponentName = matchData.opponentNickname || '상대방';
+        const opponentControllerEmoji = this.getControllerEmoji(matchData.opponentController);
+        const opponentDisplayName = `${opponentName} ${opponentControllerEmoji}`;
+        const matchDate = matchData.matchDate ? this.formatMatchDate(matchData.matchDate) : '';
+        
+        popupHeader.innerHTML = `
+            <div class="match-popup-title">
+                <span class="match-popup-date">${matchDate}</span>
+                <span class="match-popup-opponent">vs ${opponentDisplayName}</span>
+                <span class="match-popup-score ${resultClass}">${score} ${resultText}</span>
+            </div>
+        `;
+        
+        // 팝업 바디 생성 (상세 정보가 들어갈 영역)
+        const popupBody = document.createElement('div');
+        popupBody.className = 'match-popup-body';
+        popupBody.innerHTML = '<div class="match-loading">상세 정보 로딩 중...</div>';
+        
+        // 팝업 구조 조립
+        popupContent.appendChild(closeBtn);
+        popupContent.appendChild(popupHeader);
+        popupContent.appendChild(popupBody);
+        popupOverlay.appendChild(popupContent);
+        
+        // body에 팝업 추가
+        document.body.appendChild(popupOverlay);
+        
+        // body에 팝업 열림 상태 클래스 추가 (스크롤 방지)
+        document.body.classList.add('mobile-popup-open');
+        // 현재 스크롤 위치를 top으로 설정하여 스크롤 위치 유지
+        document.body.style.top = `-${currentScrollPosition}px`;
+        
+        // 팝업 배경 클릭으로 닫기
+        popupOverlay.onclick = (e) => {
+            if (e.target === popupOverlay) {
+                this.closeRivalMatchPopup();
+            }
+        };
+        
+        // ESC 키로 팝업 닫기
+        const handleEscKey = (e) => {
+            if (e.key === 'Escape') {
+                this.closeRivalMatchPopup();
+                document.removeEventListener('keydown', handleEscKey);
+            }
+        };
+        document.addEventListener('keydown', handleEscKey);
+        
+        // 상세 정보 로드
+        setTimeout(() => {
+            this.loadRivalMatchPopupDetails(matchData, popupBody);
+        }, 100);
+    }
+
+    // 모바일 팝업 닫기 함수
+    closeRivalMatchPopup() {
+        const popup = document.getElementById('matchPopup');
+        if (popup) {
+            popup.remove();
+            document.body.classList.remove('mobile-popup-open');
+            document.body.style.top = '';
+            
+            // 저장된 스크롤 위치로 복원
+            if (window.matchPopupScrollPosition !== undefined) {
+                window.scrollTo(0, window.matchPopupScrollPosition);
+                window.matchPopupScrollPosition = undefined;
+            }
+        }
+    }
+
+    // 모바일 팝업 상세 정보 로드
+    loadRivalMatchPopupDetails(matchData, popupBody) {
+        // 선수 정보가 있는지 확인
+        if (matchData.userPlayers && matchData.userPlayers.length > 0) {
+            // 대시보드의 createMatchDetailsHTML 함수 재사용
+            if (typeof createMatchDetailsHTML === 'function') {
+                popupBody.innerHTML = createMatchDetailsHTML(matchData);
+            } else {
+                popupBody.innerHTML = `
+                    <div class="match-details-content">
+                        <div class="no-player-data">
+                            <p>상세 정보를 표시할 수 없습니다.</p>
+                        </div>
+                    </div>
+                `;
+            }
+        } else {
+            popupBody.innerHTML = `
+                <div class="match-details-content">
+                    <div class="no-player-data">
+                        <p>선수 데이터를 불러올 수 없습니다.</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // 컨트롤러 이모지 가져오기 함수
+    getControllerEmoji(controller) {
+        const controllerMap = {
+            0: '🎮', // 패드
+            1: '⌨️'  // 키보드
+        };
+        return controllerMap[controller] || '🎮';
+    }
+
+    // 경기 날짜 포맷팅 함수
+    formatMatchDate(dateString) {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            
+            return `${month}/${day} ${hours}:${minutes}`;
+        } catch (error) {
+            return dateString;
+        }
     }
 
     // 승리 데이터 분석
@@ -1002,10 +1174,18 @@ class RivalMatchManager {
 
     // 초기화
     init() {
-        // 라이벌 매치 탭 클릭 이벤트 리스너 등록
+        // 데스크톱 라이벌 매치 탭 클릭 이벤트 리스너 등록
         const rivalTab = document.querySelector('[data-tab="rival"]');
         if (rivalTab) {
             rivalTab.addEventListener('click', () => {
+                this.initRivalMatchContent();
+            });
+        }
+        
+        // 모바일 라이벌 매치 탭 클릭 이벤트 리스너 등록
+        const mobileRivalTab = document.getElementById('mobileRivalTabBtn');
+        if (mobileRivalTab) {
+            mobileRivalTab.addEventListener('click', () => {
                 this.initRivalMatchContent();
             });
         }

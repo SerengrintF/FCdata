@@ -42,6 +42,15 @@
             loadMoreBtn.disabled = true;
             loadMoreBtn.innerHTML = '더 이상 없음';
         }
+        
+        // 경기수 선택 드롭박스 이벤트 리스너 추가
+        const matchCountSelect = document.getElementById('matchCountSelect');
+        if (matchCountSelect) {
+            matchCountSelect.addEventListener('change', function() {
+                const selectedCount = parseInt(this.value);
+                loadMatchesWithCount(selectedCount);
+            });
+        }
     } else {
         // 데이터가 없을 때 기본값 표시
         winRate.textContent = '-';
@@ -1172,9 +1181,9 @@ function displayRealMatches(matches) {
                     </div>
                     <div class="match-score">
                         <span class="score">${score}</span>
+                        <span class="match-result ${resultClass}">${resultText}</span>
                     </div>
                 </div>
-                <span class="match-result ${resultClass}">${resultText}</span>
                 <div class="expand-icon">▼</div>
             </div>
             <div class="match-details-expanded" style="display: none;">
@@ -1250,8 +1259,198 @@ function loadSampleMatches() {
     });
 }
 
+// 경기수 선택에 따른 경기 로드
+async function loadMatchesWithCount(option) {
+    if (!currentUserInfo || !currentUserInfo.ouid) {
+        return;
+    }
+    
+    
+    try {
+        // 기존 데이터 초기화
+        dashboardMatches = [];
+        dashboardOffset = 0;
+        
+        // 선택된 매치코드 가져오기
+        const matchType = document.getElementById('matchTypeSelect').value;
+        
+        if (option === '10') {
+            // 10경기: 10개씩 로드
+            await loadMatchesInBatches(10, matchType);
+        } else if (option === 'max') {
+            // 최대 경기: 100개까지 로드
+            await loadMatchesInBatches(100, matchType);
+        }
+        
+    } catch (error) {
+        alert('경기 데이터를 불러오는데 실패했습니다.');
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.innerHTML = '더보기';
+    }
+}
+
+// 비동기식으로 경기를 배치 단위로 로드
+async function loadMatchesInBatches(maxCount, matchType) {
+    const batchSize = 10;
+    let loadedCount = 0;
+    let batchNumber = 1;
+    
+    
+    while (loadedCount < maxCount) {
+        const remainingCount = maxCount - loadedCount;
+        const currentBatchSize = Math.min(batchSize, remainingCount);
+        
+        const url = `/api/more-matches/${currentUserInfo.ouid}/${dashboardOffset}/${currentBatchSize}?matchType=${matchType}`;
+        
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            signal: AbortSignal.timeout(10000) // 10초 타임아웃
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.matches && data.matches.length > 0) {
+            // 기존 데이터에 추가
+            dashboardMatches = dashboardMatches.concat(data.matches);
+            dashboardOffset = dashboardMatches.length;
+            loadedCount = dashboardMatches.length;
+            
+            // 화면에 경기 표시 (첫 번째 배치 시에만 전체 교체)
+            if (batchNumber === 1) {
+                displayRealMatches(dashboardMatches);
+            } else {
+                displayMoreMatches(data.matches);
+            }
+            
+            // 통계 재계산 및 표시
+            const matchStats = calculateMatchStats(dashboardMatches);
+            winRate.textContent = `${matchStats.winRate}%`;
+            winRate.className = `summary-value ${getStatClass(matchStats.winRate, 'winRate')}`;
+            avgGoals.textContent = matchStats.avgGoals.toFixed(1);
+            avgConceded.textContent = matchStats.avgConceded.toFixed(1);
+            displayTrend(matchStats.trend);
+            displayGoalAnalysis(matchStats.goalTypes);
+            displayTopPlayers(dashboardMatches);
+            displayControllerStats(dashboardMatches);
+            
+            // 로딩 중 표시
+            if (loadedCount < maxCount) {
+                loadMoreBtn.disabled = true;
+                loadMoreBtn.innerHTML = `로딩 중... (${loadedCount}/${maxCount})`;
+            }
+            
+            batchNumber++;
+        } else {
+            // 더 이상 데이터가 없으면 중단
+            break;
+        }
+    }
+    
+    // 더보기 버튼 상태 업데이트
+    if (loadedCount >= 100) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '최대 100경기';
+    } else if (loadedCount >= maxCount) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = `최대 ${maxCount}경기`;
+    } else {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.innerHTML = '더보기';
+    }
+}
+
+// 더보기 버튼에서 최대 경기 로드 (배치 단위)
+async function loadMoreMatchesInBatches(matchType) {
+    const batchSize = 10;
+    const maxTotalMatches = 100;
+
+    // 이미 로드된 경기 수 확인
+    const alreadyLoaded = dashboardMatches.length;
+
+    // 이미 100개 이상이면 종료
+    if (alreadyLoaded >= maxTotalMatches) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '최대 100경기';
+        return;
+    }
+
+    const remainingMatches = maxTotalMatches - alreadyLoaded;
+    const maxBatches = Math.ceil(remainingMatches / batchSize);
+    let loadedBatches = 0;
+
+
+    while (loadedBatches < maxBatches && dashboardMatches.length < maxTotalMatches) {
+        const remainingCount = maxTotalMatches - dashboardMatches.length;
+        const currentBatchSize = Math.min(batchSize, remainingCount);
+
+        const url = `/api/more-matches/${currentUserInfo.ouid}/${dashboardOffset}/${currentBatchSize}?matchType=${matchType}`;
+
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            signal: AbortSignal.timeout(10000) // 10초 타임아웃
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.matches && data.matches.length > 0) {
+            // 기존 데이터에 추가
+            dashboardMatches = dashboardMatches.concat(data.matches);
+            dashboardOffset = dashboardMatches.length;
+
+            // 모든 배치를 추가 방식으로 표시
+            displayMoreMatches(data.matches);
+
+            // 통계 재계산 및 표시
+            const matchStats = calculateMatchStats(dashboardMatches);
+            winRate.textContent = `${matchStats.winRate}%`;
+            winRate.className = `summary-value ${getStatClass(matchStats.winRate, 'winRate')}`;
+            avgGoals.textContent = matchStats.avgGoals.toFixed(1);
+            avgConceded.textContent = matchStats.avgConceded.toFixed(1);
+            displayTrend(matchStats.trend);
+            displayGoalAnalysis(matchStats.goalTypes);
+            displayTopPlayers(dashboardMatches);
+            displayControllerStats(dashboardMatches);
+
+            // 진행상황 표시
+            loadedBatches++;
+            const progress = Math.min(100, Math.round((dashboardMatches.length / maxTotalMatches) * 100));
+            loadMoreBtn.innerHTML = `로딩 중... ${dashboardMatches.length}/${maxTotalMatches} (${progress}%)`;
+
+        } else {
+            // 더 이상 데이터가 없으면 중단
+            break;
+        }
+    }
+    
+    // 최종 상태 업데이트
+    if (dashboardMatches.length >= maxTotalMatches) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '최대 100경기';
+    } else {
+        loadMoreBtn.disabled = false;
+        loadMoreBtn.innerHTML = '더보기';
+    }
+}
+
 // 더보기 버튼 기능 (대시보드 전용)
 async function loadMoreMatches() {
+    
     if (!currentUserInfo || !currentUserInfo.ouid) {
         return;
     }
@@ -1282,63 +1481,80 @@ async function loadMoreMatches() {
         // 선택된 매치코드 가져오기
         const matchType = document.getElementById('matchTypeSelect').value;
         
-        // 추가 경기 기록 조회 (10개씩 요청)
-        const url = `/api/more-matches/${currentUserInfo.ouid}/${dashboardOffset}/10?matchType=${matchType}`;
+        // 선택된 옵션 가져오기
+        const selectedOption = document.getElementById('matchCountSelect').value;
         
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // 선택된 옵션에 따라 로드할 경기수 결정
+        let loadCount;
+        if (selectedOption === '10') {
+            loadCount = 10;
+        } else if (selectedOption === 'max') {
+            loadCount = 100; // 최대 100경기
+        } else {
+            loadCount = 10; // 기본값
         }
         
-        const data = await response.json();
         
-        if (data.matches && data.matches.length > 0) {
-            // 화면에 추가 경기 표시
-            displayMoreMatches(data.matches);
+        // 최대 경기 선택 시 배치 단위로 로드
+        if (selectedOption === 'max') {
+            await loadMoreMatchesInBatches(matchType);
+        } else {
+            // 10경기 선택 시 기존 로직
+            const url = `/api/more-matches/${currentUserInfo.ouid}/${dashboardOffset}/${loadCount}?matchType=${matchType}`;
             
-            // 대시보드 offset 증가
-            dashboardOffset += data.matches.length;
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
             
-            // 대시보드 통계 갱신 (대시보드 전체 경기 기준으로 재계산)
-            const matchStats = calculateMatchStats(dashboardMatches);
-            winRate.textContent = `${matchStats.winRate}%`;
-            winRate.className = `summary-value ${getStatClass(matchStats.winRate, 'winRate')}`;
-            avgGoals.textContent = matchStats.avgGoals.toFixed(1);
-            avgConceded.textContent = matchStats.avgConceded.toFixed(1);
-            displayTrend(matchStats.trend);
-            displayGoalAnalysis(matchStats.goalTypes);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             
-            // 주요 선수 갱신 (대시보드 경기 기준으로 재계산)
-            displayTopPlayers(dashboardMatches);
+            const data = await response.json();
             
-            // 컨트롤러 통계 갱신
-            displayControllerStats(dashboardMatches);
-            
-            // 추가 후 경기 수 확인
-            
-            // 더보기 버튼 상태 업데이트
-            if (dashboardMatches.length >= 100) {
-                loadMoreBtn.disabled = true;
-                loadMoreBtn.innerHTML = '최대 100경기';
-            } else if (data.matches.length < 10) {
-                // 10개 미만이면 더 이상 데이터가 없는 것으로 간주
+            if (data.matches && data.matches.length > 0) {
+                // 화면에 추가 경기 표시
+                displayMoreMatches(data.matches);
+                
+                // 대시보드 offset 증가
+                dashboardOffset += data.matches.length;
+                
+                // 대시보드 통계 갱신 (대시보드 전체 경기 기준으로 재계산)
+                const matchStats = calculateMatchStats(dashboardMatches);
+                winRate.textContent = `${matchStats.winRate}%`;
+                winRate.className = `summary-value ${getStatClass(matchStats.winRate, 'winRate')}`;
+                avgGoals.textContent = matchStats.avgGoals.toFixed(1);
+                avgConceded.textContent = matchStats.avgConceded.toFixed(1);
+                displayTrend(matchStats.trend);
+                displayGoalAnalysis(matchStats.goalTypes);
+                
+                // 주요 선수 갱신 (대시보드 경기 기준으로 재계산)
+                displayTopPlayers(dashboardMatches);
+                
+                // 컨트롤러 통계 갱신
+                displayControllerStats(dashboardMatches);
+                
+                // 더보기 버튼 상태 업데이트
+                if (dashboardMatches.length >= 100) {
+                    loadMoreBtn.disabled = true;
+                    loadMoreBtn.innerHTML = '최대 100경기';
+                } else if (data.matches.length < loadCount) {
+                    // 요청한 개수보다 적으면 더 이상 데이터가 없는 것으로 간주
+                    loadMoreBtn.disabled = true;
+                    loadMoreBtn.innerHTML = '더 이상 없음';
+                } else {
+                    // 정상적으로 추가된 경우 버튼 유지
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.innerHTML = '더보기';
+                }
+            } else {
+                // 더 이상 데이터가 없으면 버튼 비활성화
                 loadMoreBtn.disabled = true;
                 loadMoreBtn.innerHTML = '더 이상 없음';
-            } else {
-                // 정상적으로 10개 추가된 경우 버튼 유지
-                loadMoreBtn.disabled = false;
-                loadMoreBtn.innerHTML = '더보기';
             }
-        } else {
-            // 더 이상 데이터가 없으면 버튼 비활성화
-            loadMoreBtn.disabled = true;
-            loadMoreBtn.innerHTML = '더 이상 없음';
         }
         
     } catch (error) {
@@ -1351,32 +1567,33 @@ async function loadMoreMatches() {
 
 // 추가 경기 기록 표시
 function displayMoreMatches(moreMatches) {
-    
+
     if (moreMatches.length === 0) {
         return;
     }
-    
+
     // API에서 이미 최신순으로 정렬되어 제공되므로 별도 정렬 불필요
-    
-    // 현재 사용자 정보에 새로운 경기들을 추가 (최신 경기가 앞에 오도록)
-    if (currentUserInfo && currentUserInfo.matches) {
-        currentUserInfo.matches = [...moreMatches, ...currentUserInfo.matches];
-        
-        // 대시보드 매치 데이터도 동일하게 업데이트
-        dashboardMatches = [...moreMatches, ...dashboardMatches];
-        
-        // 대시보드 매치 데이터를 날짜순으로 정렬 (최신순)
-        dashboardMatches.sort((a, b) => {
-            const dateA = new Date(a.matchDate);
-            const dateB = new Date(b.matchDate);
-            return dateB - dateA; // 최신순
-        });
-        
-        // 통계 재계산 및 업데이트
-        updateMatchStatistics();
-    }
-    
+    // dashboardMatches는 호출하는 쪽에서 이미 업데이트하므로 여기서는 화면 표시만 담당
+
+    // 중복 방지: 이미 표시된 matchId 수집
+    const existingMatchIds = new Set();
+    const existingMatches = matchesList.querySelectorAll('.match-item');
+    existingMatches.forEach(elem => {
+        try {
+            const matchData = JSON.parse(elem.getAttribute('data-match'));
+            if (matchData && matchData.matchId) {
+                existingMatchIds.add(matchData.matchId);
+            }
+        } catch (e) {}
+    });
+
     moreMatches.forEach((match, index) => {
+        // 중복 체크: 이미 표시된 경기는 건너뛰기
+        if (existingMatchIds.has(match.matchId)) {
+            return;
+        }
+
+
         const matchElement = document.createElement('div');
         matchElement.className = 'match-item';
         
@@ -1417,9 +1634,9 @@ function displayMoreMatches(moreMatches) {
                     </div>
                     <div class="match-score">
                         <span class="score">${score}</span>
+                        <span class="match-result ${resultClass}">${resultText}</span>
                     </div>
                 </div>
-                <span class="match-result ${resultClass}">${resultText}</span>
                 <div class="expand-icon">▼</div>
             </div>
             <div class="match-details-expanded" style="display: none;">
@@ -1432,20 +1649,7 @@ function displayMoreMatches(moreMatches) {
         
         matchesList.appendChild(matchElement);
     });
-    
-    // 추가된 경기들을 전체적으로 시간순으로 재정렬
-    const allMatches = Array.from(matchesList.children);
-    allMatches.sort((a, b) => {
-        const dateA = new Date(a.querySelector('.match-date').textContent);
-        const dateB = new Date(b.querySelector('.match-date').textContent);
-        return dateB - dateA; // 최신순
-    });
-    
-    // 재정렬된 순서로 DOM에 다시 추가
-    allMatches.forEach(match => {
-        matchesList.appendChild(match);
-    });
-    
+
     // 경기 수 업데이트
     updateMatchCount();
 }
@@ -1504,16 +1708,204 @@ function toggleMatchDetails(headerElement) {
     const expandedSection = matchItem.querySelector('.match-details-expanded');
     const expandIcon = headerElement.querySelector('.expand-icon');
     
-    if (expandedSection.style.display === 'none' || expandedSection.style.display === '') {
-        // 확장
-        expandedSection.style.display = 'block';
-        expandIcon.textContent = '▲';
-        expandIcon.style.transform = 'rotate(180deg)';
-        
-        // 상세 정보 로드
-        loadMatchDetails(matchItem);
+    // 모바일 감지 개선
+    const isMobile = window.innerWidth <= 1024 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // 모바일에서는 카드 확장 대신 팝업 호출
+        openMatchPopup(matchItem);
     } else {
-        // 축소
+        // 데스크톱에서는 기존 방식
+        if (expandedSection.style.display === 'none' || expandedSection.style.display === '') {
+            // 확장
+            expandedSection.style.display = 'block';
+            expandIcon.textContent = '▲';
+            expandIcon.style.transform = 'rotate(180deg)';
+            
+            // 상세 정보 로드
+            loadMatchDetails(matchItem);
+        } else {
+            // 축소
+            expandedSection.style.display = 'none';
+            expandIcon.textContent = '▼';
+            expandIcon.style.transform = 'rotate(0deg)';
+        }
+    }
+}
+
+// 모바일 팝업 열기 함수
+function openMatchPopup(matchItem) {
+    const matchData = JSON.parse(matchItem.getAttribute('data-match'));
+    
+    // 현재 스크롤 위치 저장
+    const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    window.matchPopupScrollPosition = currentScrollPosition;
+    
+    // 기존 팝업이 있다면 제거
+    const existingPopup = document.getElementById('matchPopup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+    
+    // 팝업 오버레이 생성
+    const popupOverlay = document.createElement('div');
+    popupOverlay.id = 'matchPopup';
+    popupOverlay.className = 'match-popup-overlay';
+    
+    // 팝업 콘텐츠 생성
+    const popupContent = document.createElement('div');
+    popupContent.className = 'match-popup-content';
+    
+    // 닫기 버튼 생성
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'match-popup-close-btn';
+    closeBtn.innerHTML = '×';
+    closeBtn.setAttribute('aria-label', '팝업 닫기');
+    closeBtn.onclick = closeMatchPopup;
+    
+    // 팝업 헤더 생성 (경기 정보)
+    const popupHeader = document.createElement('div');
+    popupHeader.className = 'match-popup-header';
+    
+    const result = matchData.matchResult || 0;
+    const resultText = result === 1 ? '승' : result === 2 ? '패' : '무';
+    const resultClass = result === 1 ? 'win' : result === 2 ? 'lose' : 'draw';
+    const goals = matchData.userGoals || 0;
+    const conceded = matchData.opponentGoals || 0;
+    const score = `${goals} - ${conceded}`;
+    const opponentName = matchData.opponentNickname || '상대방';
+    const opponentControllerEmoji = getControllerEmoji(matchData.opponentController);
+    const opponentDisplayName = `${opponentName} ${opponentControllerEmoji}`;
+    const matchDate = matchData.matchDate ? formatMatchDate(matchData.matchDate) : '';
+    
+    popupHeader.innerHTML = `
+        <div class="match-popup-title">
+            <span class="match-popup-date">${matchDate}</span>
+            <span class="match-popup-opponent">vs ${opponentDisplayName}</span>
+            <span class="match-popup-score ${resultClass}">${score} ${resultText}</span>
+        </div>
+    `;
+    
+    // 팝업 바디 생성 (상세 정보가 들어갈 영역)
+    const popupBody = document.createElement('div');
+    popupBody.className = 'match-popup-body';
+    popupBody.innerHTML = '<div class="match-loading">상세 정보 로딩 중...</div>';
+    
+    // 팝업 구조 조립
+    popupContent.appendChild(closeBtn);
+    popupContent.appendChild(popupHeader);
+    popupContent.appendChild(popupBody);
+    popupOverlay.appendChild(popupContent);
+    
+    // body에 팝업 추가
+    document.body.appendChild(popupOverlay);
+    
+    // body에 팝업 열림 상태 클래스 추가 (스크롤 방지)
+    document.body.classList.add('mobile-popup-open');
+    // 현재 스크롤 위치를 top으로 설정하여 스크롤 위치 유지
+    document.body.style.top = `-${currentScrollPosition}px`;
+    
+    // 팝업 배경 클릭으로 닫기
+    popupOverlay.onclick = (e) => {
+        if (e.target === popupOverlay) {
+            closeMatchPopup();
+        }
+    };
+    
+    // ESC 키로 팝업 닫기
+    const handleEscKey = (e) => {
+        if (e.key === 'Escape') {
+            closeMatchPopup();
+            document.removeEventListener('keydown', handleEscKey);
+        }
+    };
+    document.addEventListener('keydown', handleEscKey);
+    
+    // 상세 정보 로드
+    setTimeout(() => {
+        loadMatchPopupDetails(matchData, popupBody);
+    }, 100);
+}
+
+// 모바일 팝업 닫기 함수
+function closeMatchPopup() {
+    const popup = document.getElementById('matchPopup');
+    if (popup) {
+        popup.remove();
+        document.body.classList.remove('mobile-popup-open');
+        
+        // body 스타일 초기화
+        document.body.style.top = '';
+        
+        // 저장된 스크롤 위치로 복원
+        if (window.matchPopupScrollPosition !== undefined) {
+            setTimeout(() => {
+                window.scrollTo({
+                    top: window.matchPopupScrollPosition,
+                    behavior: 'instant'
+                });
+                window.matchPopupScrollPosition = undefined;
+            }, 50); // 약간의 지연을 두어 DOM 업데이트 후 실행
+        }
+    }
+}
+
+// 모바일 팝업 상세 정보 로드
+function loadMatchPopupDetails(matchData, popupBody) {
+    // 선수 정보가 있는지 확인
+    if (matchData.userPlayers && matchData.userPlayers.length > 0) {
+        popupBody.innerHTML = createMatchDetailsHTML(matchData);
+    } else {
+        // 디버깅 정보 포함
+        const debugInfo = `
+            <div class="match-details-content">
+                <div class="no-player-data">
+                    <p>선수 데이터를 불러올 수 없습니다.</p>
+                    <p>API에서 제공되지 않았거나 데이터 구조가 변경되었을 수 있습니다.</p>
+                    <details style="margin-top: 16px;">
+                        <summary>디버깅 정보 (클릭하여 확인)</summary>
+                        <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; margin-top: 8px; font-size: 12px; overflow-x: auto;">
+매치 ID: ${matchData.matchId}
+사용자 선수 데이터: ${JSON.stringify(matchData.userPlayers, null, 2)}
+상대방 선수 데이터: ${JSON.stringify(matchData.opponentPlayers, null, 2)}
+전체 매치 데이터: ${JSON.stringify(matchData, null, 2)}
+                        </pre>
+                    </details>
+                </div>
+            </div>
+        `;
+        popupBody.innerHTML = debugInfo;
+    }
+}
+
+// 모바일 팝업 닫기 함수 (기존 함수명 유지)
+function closeMatchDetails(headerElement) {
+    const matchItem = headerElement.closest('.match-item');
+    const expandedSection = matchItem.querySelector('.match-details-expanded');
+    const expandIcon = headerElement.querySelector('.expand-icon');
+    
+    // 모바일 감지 개선
+    const isMobile = window.innerWidth <= 1024 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // 모바일에서 애니메이션 적용
+        expandedSection.classList.remove('show');
+        
+        // 닫기 버튼 제거
+        const closeBtn = expandedSection.querySelector('.close-btn');
+        if (closeBtn) {
+            closeBtn.remove();
+        }
+        
+        setTimeout(() => {
+            expandedSection.style.display = 'none';
+            expandIcon.textContent = '▼';
+            expandIcon.style.transform = 'rotate(0deg)';
+            // body에서 팝업 열림 상태 클래스 제거
+            document.body.classList.remove('mobile-popup-open');
+        }, 300);
+    } else {
+        // 데스크톱에서는 즉시 닫기
         expandedSection.style.display = 'none';
         expandIcon.textContent = '▼';
         expandIcon.style.transform = 'rotate(0deg)';

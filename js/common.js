@@ -274,8 +274,18 @@ function initTheme() {
     document.documentElement.setAttribute('data-theme', 'dark');
 }
 
-// 검색 버튼 클릭 이벤트
-searchBtn.addEventListener('click', searchUser);
+// 검색 버튼 클릭 이벤트: 페이지의 검색 버튼은 항상 즉시 검색 실행
+function isMobileUA() {
+    return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
+
+function handleSearchClick(e) {
+    // 즉시 검색 수행 (팝업은 하단 검색 탭에서만 호출)
+    if (e) e.preventDefault();
+    searchUser();
+}
+
+searchBtn.addEventListener('click', handleSearchClick);
 nicknameInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         searchUser();
@@ -292,6 +302,14 @@ tabBtns.forEach(btn => {
 
 // YouTube 버튼 클릭 추적
 const youtubeBtn = document.getElementById('followBtn');
+const logoEl = document.getElementById('logo');
+const mobileTabbar = document.getElementById('mobileTabbar');
+// 모바일 검색 팝업 요소들
+const mobileSearchPopup = document.getElementById('mobileSearchPopup');
+const mobileNicknameInput = document.getElementById('mobileNicknameInput');
+const mobileMatchTypeSelect = document.getElementById('mobileMatchTypeSelect');
+const confirmMobileSearchBtn = document.getElementById('confirmMobileSearchBtn');
+const closeMobileSearchBtn = document.getElementById('closeMobileSearchBtn');
 if (youtubeBtn) {
     youtubeBtn.addEventListener('click', () => {
         if (typeof gtag !== 'undefined') {
@@ -304,6 +322,129 @@ if (youtubeBtn) {
     });
 }
 
+// Logo click: go home-like behavior and show search on mobile
+if (logoEl) {
+    logoEl.addEventListener('click', () => {
+        try {
+            var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                document.body.classList.remove('mobile-searched');
+                // scroll to top to reveal header/search
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // activate search tab in bottom bar when returning home
+                setActiveMobileTab('search');
+            }
+        } catch (e) {}
+    });
+}
+
+// Helper to set active state on mobile bottom tabs
+function setActiveMobileTab(tabId) {
+    if (!mobileTabbar) return;
+    const items = mobileTabbar.querySelectorAll('.mobile-tabitem');
+    items.forEach(i => i.classList.remove('active'));
+    const target = mobileTabbar.querySelector(`.mobile-tabitem[data-tab="${tabId}"]`);
+    if (target) target.classList.add('active');
+}
+
+// Wire up bottom bar actions
+if (mobileTabbar) {
+    mobileTabbar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.mobile-tabitem');
+        if (!btn) return;
+        const tabId = btn.getAttribute('data-tab');
+        // Special case: search tab opens mobile popup (keeps bottom tab visible)
+        if (tabId === 'search') {
+            openMobileSearch();
+            setActiveMobileTab('search');
+            return;
+        }
+
+        // Rival tab might be hidden depending on matchType
+        if (tabId === 'rival') {
+            const rivalTabBtn = document.getElementById('rivalTabBtn');
+            if (rivalTabBtn && rivalTabBtn.style.display === 'none') {
+                return; // ignore when not available
+            }
+        }
+
+        // Switch main content tab and sync active state
+        switchTab(tabId);
+        setActiveMobileTab(tabId);
+    });
+}
+
+// 모바일 검색 팝업 동작
+function openMobileSearch() {
+    if (!mobileSearchPopup) return;
+    // 메인 매치타입 값을 팝업에 반영
+    const mainMatch = document.getElementById('matchTypeSelect');
+    if (mainMatch && mobileMatchTypeSelect) {
+        mobileMatchTypeSelect.value = mainMatch.value;
+    }
+    // 기존 입력값을 팝업에 프리필
+    if (nicknameInput && mobileNicknameInput) {
+        mobileNicknameInput.value = nicknameInput.value || '';
+    }
+    mobileSearchPopup.style.display = 'flex';
+    document.body.classList.add('mobile-popup-open');
+    lockScroll();
+    setActiveMobileTab('search');
+    setTimeout(() => { try { mobileNicknameInput && mobileNicknameInput.focus(); } catch(e){} }, 50);
+}
+
+function closeMobileSearch() {
+    if (!mobileSearchPopup) return;
+    mobileSearchPopup.style.display = 'none';
+    document.body.classList.remove('mobile-popup-open');
+    unlockScroll();
+}
+
+if (closeMobileSearchBtn) {
+    closeMobileSearchBtn.addEventListener('click', closeMobileSearch);
+}
+
+if (confirmMobileSearchBtn) {
+    confirmMobileSearchBtn.addEventListener('click', () => {
+        // 값 복사 후 실제 검색 실행 (기존 데이터는 확인 전까지 유지)
+        const mainMatch = document.getElementById('matchTypeSelect');
+        if (mobileMatchTypeSelect && mainMatch) {
+            mainMatch.value = mobileMatchTypeSelect.value;
+        }
+        if (mobileNicknameInput && nicknameInput) {
+            nicknameInput.value = mobileNicknameInput.value.trim();
+        }
+        // 팝업을 유지한 채로 검색 시작 (팝업 하단에 로딩 노출)
+        searchUser();
+    });
+}
+
+if (mobileSearchPopup) {
+    mobileSearchPopup.addEventListener('click', (e) => {
+        if (e.target === mobileSearchPopup) closeMobileSearch();
+    });
+}
+
+if (mobileNicknameInput) {
+    mobileNicknameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmMobileSearchBtn && confirmMobileSearchBtn.click();
+        }
+    });
+}
+
+// Sync mobile rival tab visibility with desktop control
+function syncMobileRivalTabVisibility() {
+    const rivalTabBtn = document.getElementById('rivalTabBtn');
+    const mobileRival = document.getElementById('mobileRivalTabBtn');
+    if (!mobileRival || !rivalTabBtn) return;
+    mobileRival.style.display = rivalTabBtn.style.display || '';
+}
+
+// Call sync when rival visibility changes within search flow
+// Patch into existing places toggling rivalTabBtn
+
 
 // 유저 검색 함수 (서버에서 한 번에 처리)
 async function searchUser() {
@@ -315,9 +456,19 @@ async function searchUser() {
     }
     
     try {
-        showLoading(true);
+        // If searching via mobile popup, show popup loader and keep global loader hidden
+        const popupLoader = document.getElementById('mobilePopupLoading');
+        const viaMobilePopup = document.body.classList.contains('mobile-popup-open');
+        if (viaMobilePopup && popupLoader) {
+            popupLoader.style.display = 'flex';
+        } else {
+            showLoading(true);
+        }
         hideError();
-        hideResults();
+        // 모바일 팝업 검색 시 기존 데이터는 유지
+        if (!viaMobilePopup) {
+            hideResults();
+        }
         
         // 선택된 매치코드 가져오기
         const matchType = document.getElementById('matchTypeSelect').value;
@@ -365,15 +516,18 @@ async function searchUser() {
                 if (rivalTabBtn) {
                     if (matchType === '50' || matchType === '60') {
                         // 공식경기 또는 친선경기: 라이벌 매치 탭 표시
-                        rivalTabBtn.style.display = 'block';
+                        rivalTabBtn.style.display = 'inline-flex';
+                        syncMobileRivalTabVisibility();
                     } else if (matchType === '52') {
                         // 감독모드: 라이벌 매치 탭 숨김
                         rivalTabBtn.style.display = 'none';
+                        syncMobileRivalTabVisibility();
                         
                         // 현재 라이벌 매치 탭이 활성화되어 있다면 대시보드로 이동
                         const activeTab = document.querySelector('.tab-btn.active');
                         if (activeTab && activeTab.dataset.tab === 'rival') {
                             switchTab('dashboard');
+                            setActiveMobileTab('dashboard');
                         }
                     }
                 }
@@ -433,6 +587,19 @@ async function searchUser() {
                 
                 displayPlayerInfo(userInfo, nickname);
                 showDashboard(userInfo);
+
+                // Mobile-only: hide search section after successful search
+                try {
+                    var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+                    if (isMobile) {
+                        document.body.classList.add('mobile-searched');
+                    }
+                } catch (e) {}
+
+                // Close mobile popup after data loaded
+                if (viaMobilePopup) {
+                    closeMobileSearch();
+                }
             } else {
                 showError('유저 정보를 가져올 수 없습니다.');
             }
@@ -448,6 +615,8 @@ async function searchUser() {
             showError('네트워크 연결을 확인하고 다시 시도해주세요.');
         }
     } finally {
+        const popupLoader = document.getElementById('mobilePopupLoading');
+        if (popupLoader) popupLoader.style.display = 'none';
         showLoading(false);
     }
 }

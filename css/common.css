@@ -1408,7 +1408,7 @@ body.modal-open {
 /* 모바일 대응 */
 @media (max-width: 768px) {
     .scroll-to-top {
-        bottom: 20px;
+        bottom: 76px; /* 하단 탭(56px) + 여백(20px) */
         right: 20px;
         width: 45px;
         height: 45px;
