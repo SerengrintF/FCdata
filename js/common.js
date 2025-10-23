@@ -1,4 +1,43 @@
-﻿// API 설정 - 서버를 통해 처리하므로 프론트엔드에서는 불필요
+﻿// Pull-to-refresh 방지 (클릭 이벤트 보존)
+(function() {
+	let startY = 0;
+	let isAtTop = false;
+	let isPullToRefresh = false;
+	
+	// 터치 시작 위치 감지
+	document.addEventListener('touchstart', function(e) {
+		startY = e.touches[0].clientY;
+		isAtTop = window.scrollY === 0;
+		isPullToRefresh = false;
+	}, { passive: true });
+	
+	// 터치 이동 중 pull-to-refresh 감지 및 차단
+	document.addEventListener('touchmove', function(e) {
+		if (!isAtTop) return;
+		
+		const currentY = e.touches[0].clientY;
+		const diffY = currentY - startY;
+		
+		// 상단에서 아래로 당기는 동작만 감지 (50px 이상)
+		if (diffY > 50) {
+			isPullToRefresh = true;
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+	}, { passive: false });
+	
+	// 터치 종료 시 pull-to-refresh만 차단
+	document.addEventListener('touchend', function(e) {
+		if (isPullToRefresh) {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+	}, { passive: false });
+})();
+
+// API 설정 - 서버를 통해 처리하므로 프론트엔드에서는 불필요
 // const API_KEY는 보안상 제거됨 - 서버(.env)에서 관리
 const BASE_URL = 'https://open.api.nexon.com/fconline/v1';
 

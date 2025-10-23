@@ -1,5 +1,31 @@
 /* Mobile/Tablet overrides only. Desktop styles remain untouched. */
 
+/* Pull-to-refresh 방지 설정 */
+@media (max-width: 1024px) {
+	html, body {
+		overscroll-behavior-y: none !important;
+		overscroll-behavior: none !important;
+		-webkit-overflow-scrolling: touch !important;
+	}
+	
+	/* Pull-to-refresh 방지만 적용, 클릭 이벤트는 유지 */
+	/* body의 position: fixed와 overflow: hidden 제거하여 클릭 이벤트 보존 */
+	
+	/* 기존 overscroll-behavior 설정 강화 */
+	html {
+		overscroll-behavior: none !important;
+		overscroll-behavior-y: none !important;
+		overscroll-behavior-x: none !important;
+	}
+	
+	body {
+		overscroll-behavior: none !important;
+		overscroll-behavior-y: none !important;
+		overscroll-behavior-x: none !important;
+		touch-action: pan-x pan-y !important;
+	}
+}
+
 /* Root mobile tokens */
 @media (max-width: 1024px) {
 	:root {
@@ -14,6 +40,11 @@
 
 /* Header/Banner */
 @media (max-width: 1024px) {
+
+	.player-characteristics{
+		max-width: 100%;
+	 }
+	 
 	.main-header {
 		position: sticky;
 		top: 0;
