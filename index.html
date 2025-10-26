@@ -56,9 +56,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://openapi.nexon.com/js/analytics.js?app_id=201448" async></script>
     
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8530704724833439"
-         crossorigin="anonymous"></script>
+    <!-- Google AdSense - 조건부 로딩으로 변경됨 -->
     <script>
       (function() {
         var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
@@ -133,6 +131,68 @@
                 </div>
             </div>
             <button id="searchBtn">검색</button>
+        </div>
+
+        <!-- 환영 섹션 (초기 콘텐츠) -->
+        <div class="welcome-section" id="welcomeSection">
+            <div class="welcome-content">
+                <div class="welcome-header">
+                    <h1>FC온라인 전적 분석 도구</h1>
+                    <p class="welcome-subtitle">닉네임을 검색하여 상세한 경기 데이터를 확인하세요</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-content">
+                            <h3>최근 100경기 분석</h3>
+                            <p>상세한 경기 기록과 통계를 제공합니다</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">⚽</div>
+                        <div class="feature-content">
+                            <h3>구단별 성과 통계</h3>
+                            <p>동일한 선수들로 구성된 구단의 성과를 분석합니다</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <div class="feature-content">
+                            <h3>포메이션 분석</h3>
+                            <p>사용한 포메이션별 경기 성과를 비교합니다</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">⚔️</div>
+                        <div class="feature-content">
+                            <h3>라이벌 매치</h3>
+                            <p>특정 상대와의 전적을 분석합니다</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="usage-guide">
+                    <h3>사용 방법</h3>
+                    <div class="guide-steps">
+                        <div class="guide-step">
+                            <span class="step-number">1</span>
+                            <span class="step-text">위 검색창에 FC온라인 닉네임을 입력하세요</span>
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">2</span>
+                            <span class="step-text">경기 유형을 선택하세요 (공식경기/감독모드/친선경기)</span>
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">3</span>
+                            <span class="step-text">검색 버튼을 클릭하여 데이터를 확인하세요</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 검색 중 상태 알림 -->
@@ -295,6 +355,16 @@
                         </div>
                         <div class="matches-list" id="matchesList">
                             <!-- 경기 기록이 여기에 표시됩니다 -->
+                        </div>
+                        
+                        <!-- 광고 유닛 (데이터 로드 후에만 표시) -->
+                        <div class="ad-container" id="dashboardAd" style="display: none;">
+                            <ins class="adsbygoogle"
+                                 style="display:block"
+                                 data-ad-client="ca-pub-8530704724833439"
+                                 data-ad-slot="1234567890"
+                                 data-ad-format="auto"
+                                 data-full-width-responsive="true"></ins>
                         </div>
                     </div>
                 </div>
@@ -691,6 +761,58 @@
     <script src="js/formation.js"></script>
     <!-- Rival Match JavaScript -->
     <script src="js/rival.js"></script>
+    
+    <!-- 애드센스 조건부 로딩 스크립트 -->
+    <script>
+        // 애드센스 스크립트를 조건부로 로드하는 함수
+        function loadAdSense() {
+            // 이미 로드되었는지 확인
+            if (document.querySelector('script[src*="adsbygoogle.js"]')) {
+                return;
+            }
+            
+            // 실제 데이터가 로드된 후에만 광고 스크립트 로드
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8530704724833439';
+            script.crossOrigin = 'anonymous';
+            
+            // 스크립트 로드 완료 후 광고 유닛 활성화
+            script.onload = function() {
+                // 광고 컨테이너 표시
+                const adContainer = document.getElementById('dashboardAd');
+                if (adContainer) {
+                    adContainer.style.display = 'block';
+                }
+                
+                // 광고 유닛 초기화
+                try {
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                } catch (e) {
+                    console.log('AdSense initialization error:', e);
+                }
+                
+                console.log('AdSense script and ads loaded successfully');
+            };
+            
+            document.head.appendChild(script);
+        }
+        
+        // 데이터 로드 완료 시 애드센스 로드
+        function onDataLoaded() {
+            // 환영 섹션 숨기기
+            const welcomeSection = document.getElementById('welcomeSection');
+            if (welcomeSection) {
+                welcomeSection.style.display = 'none';
+            }
+            
+            // 애드센스 로드
+            setTimeout(loadAdSense, 1000); // 1초 후 로드하여 사용자 경험 개선
+        }
+        
+        // 전역 함수로 등록
+        window.onDataLoaded = onDataLoaded;
+    </script>
 </body>
 </html>
 

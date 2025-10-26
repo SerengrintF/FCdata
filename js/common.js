@@ -626,6 +626,11 @@ async function searchUser() {
                 
                 displayPlayerInfo(userInfo, nickname);
                 showDashboard(userInfo);
+                
+                // 데이터 로드 완료 후 애드센스 로드
+                if (typeof window.onDataLoaded === 'function') {
+                    window.onDataLoaded();
+                }
 
                 // Mobile-only: hide search section after successful search
                 try {

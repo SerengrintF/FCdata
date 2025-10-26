@@ -45,6 +45,78 @@
 		max-width: 100%;
 	 }
 	 
+	/* 환영 섹션 모바일 스타일 */
+	.welcome-section {
+		padding: 2rem 1rem;
+		margin: 1rem 0;
+	}
+	
+	.welcome-header h1 {
+		font-size: 1.8rem;
+		margin-bottom: 0.8rem;
+	}
+	
+	.welcome-subtitle {
+		font-size: 1rem;
+	}
+	
+	.features-grid {
+		grid-template-columns: 1fr;
+		gap: 1rem;
+		margin-bottom: 2rem;
+	}
+	
+	.feature-card {
+		padding: 1rem;
+		flex-direction: column;
+		text-align: center;
+		gap: 0.8rem;
+	}
+	
+	.feature-icon {
+		font-size: 1.5rem;
+	}
+	
+	.feature-content h3 {
+		font-size: 1rem;
+	}
+	
+	.feature-content p {
+		font-size: 0.85rem;
+	}
+	
+	.usage-guide {
+		padding: 1.5rem;
+	}
+	
+	.usage-guide h3 {
+		font-size: 1.1rem;
+		margin-bottom: 1rem;
+	}
+	
+	.guide-step {
+		padding: 0.8rem;
+		flex-direction: column;
+		text-align: center;
+		gap: 0.5rem;
+	}
+	
+	.step-number {
+		width: 1.5rem;
+		height: 1.5rem;
+		font-size: 0.8rem;
+	}
+	
+	.step-text {
+		font-size: 0.9rem;
+	}
+	
+	/* 광고 컨테이너 모바일 스타일 */
+	.ad-container {
+		margin: 1rem 0;
+		padding: 0.8rem;
+	}
+	 
 	.main-header {
 		position: sticky;
 		top: 0;
