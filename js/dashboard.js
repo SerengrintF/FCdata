@@ -4459,9 +4459,102 @@ function resetToHomePage() {
     
 }
 
+// 환영 섹션 데이터 로드 함수
+async function loadWelcomeContent() {
+    try {
+        console.log('Loading welcome content...');
+        // API에서 통계 데이터 가져오기
+        const response = await fetch('/api/public/stats');
+        console.log('API Response status:', response.status);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('API Data:', data);
+            
+            // 사이트 통계 표시
+            if (data.summary) {
+                const totalVisitors = document.getElementById('totalVisitors');
+                const totalSearches = document.getElementById('totalSearches');
+                const todayVisitors = document.getElementById('todayVisitors');
+                
+                if (totalVisitors) {
+                    const num = data.summary.totalVisitors || 0;
+                    totalVisitors.textContent = formatNumber(num);
+                }
+                if (totalSearches) {
+                    const num = data.summary.totalSearches || 0;
+                    totalSearches.textContent = formatNumber(num);
+                }
+                if (todayVisitors) {
+                    const num = data.summary.todayVisitors || 0;
+                    todayVisitors.textContent = formatNumber(num);
+                }
+            }
+            
+            // 인기 검색어 표시
+            const popularList = document.getElementById('popularList');
+            if (popularList && data.topSearches && data.topSearches.length > 0) {
+                popularList.innerHTML = data.topSearches
+                    .slice(0, 10) // 최대 10개
+                    .map(item => 
+                        `<div class="popular-item" onclick="searchNickname('${item.nickname}')">${item.nickname}</div>`
+                    ).join('');
+            } else if (popularList) {
+                // 데이터가 없으면 메시지 표시
+                popularList.innerHTML = '<div class="loading-text">아직 검색 데이터가 없습니다</div>';
+            }
+        } else {
+            console.error('API Response not OK:', response.status);
+            // 에러 발생 시 기본값 표시
+            document.getElementById('totalVisitors').textContent = '-';
+            document.getElementById('totalSearches').textContent = '-';
+            document.getElementById('todayVisitors').textContent = '-';
+            document.getElementById('popularList').innerHTML = '<div class="loading-text">데이터를 불러올 수 없습니다</div>';
+        }
+    } catch (error) {
+        console.log('Failed to load welcome content:', error);
+        // 에러 발생 시 기본값 표시
+        document.getElementById('totalVisitors').textContent = '-';
+        document.getElementById('totalSearches').textContent = '-';
+        document.getElementById('todayVisitors').textContent = '-';
+        document.getElementById('popularList').innerHTML = '<div class="loading-text">데이터를 불러올 수 없습니다</div>';
+    }
+}
+
+// 숫자 포맷팅 함수
+function formatNumber(num) {
+    if (!num || num === 0) {
+        return '0';
+    }
+    if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K+';
+    }
+    return num.toString();
+}
+
+// 인기 검색어 클릭 시 검색 실행
+function searchNickname(nickname) {
+    const input = document.getElementById('nicknameInput');
+    const searchBtn = document.getElementById('searchBtn');
+    if (input && searchBtn) {
+        input.value = nickname;
+        searchBtn.click();
+    }
+}
+
+// 전역 함수로 등록
+window.searchNickname = searchNickname;
+
 // 페이지 로드 시 초기화
 window.addEventListener('load', function() {
-    initTheme();
+    // initTheme 함수가 정의되어 있는지 확인 후 호출
+    if (typeof initTheme === 'function') {
+        initTheme();
+    }
+    
+    // 환영 섹션 데이터 로드
+    loadWelcomeContent();
+    
     nicknameInput.focus();
     
     // teamDetailPanel 초기화

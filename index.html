@@ -83,7 +83,7 @@
                     <img src="logo.svg" alt="FC Data" class="logo-image">
                 </div>
                 <div class="header-actions">
-                    <a href="https://www.youtube.com/@sereng88" target="_blank" class="action-btn primary youtube-btn" id="followBtn">
+                    <a href="https://www.youtube.com/@sereng88" target="_blank" class="action-btn primary youtube-btn" id="followBtn" style="display: none;">
                         <svg class="youtube-icon" viewBox="0 0 24 24" width="20" height="20">
                             <path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                         </svg>
@@ -131,6 +131,12 @@
                 </div>
             </div>
             <button id="searchBtn">검색</button>
+        </div>
+
+        <!-- 검색 중 상태 알림 -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <span>검색 중...</span>
         </div>
 
         <!-- 환영 섹션 (초기 콘텐츠) -->
@@ -192,13 +198,43 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- 검색 중 상태 알림 -->
-        <div class="loading" id="loading" style="display: none;">
-            <div class="spinner"></div>
-            <span>검색 중...</span>
+                <!-- 사이트 통계 섹션 -->
+                <div class="site-stats-section">
+                    <h3>📈 사이트 통계</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="totalVisitors">-</div>
+                                <div class="stat-label">누적 방문자</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="totalSearches">-</div>
+                                <div class="stat-label">총 검색 수</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="todayVisitors">-</div>
+                                <div class="stat-label">오늘 방문자</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 인기 검색어 섹션 -->
+                <div class="popular-searches-section">
+                    <h3>🔥 인기 검색</h3>
+                    <div class="popular-list" id="popularList">
+                        <div class="loading-text">로딩 중...</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 선수 기본 정보 섹션 -->
@@ -228,6 +264,14 @@
                             <span class="characteristic-value" id="gameTendency">-</span>
                         </div>
                     </div>
+                </div>
+                
+                <!-- 요즘 나의 경기는? 버튼 -->
+                <div class="fun-data-section">
+                    <button class="fun-data-btn" id="funDataBtn" onclick="showFunDataCards()">
+                        <span class="btn-icon">🎲</span>
+                        <span class="btn-text">요즘 나의 경기는?</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -357,15 +401,7 @@
                             <!-- 경기 기록이 여기에 표시됩니다 -->
                         </div>
                         
-                        <!-- 광고 유닛 (데이터 로드 후에만 표시) -->
-                        <div class="ad-container" id="dashboardAd" style="display: none;">
-                            <ins class="adsbygoogle"
-                                 style="display:block"
-                                 data-ad-client="ca-pub-8530704724833439"
-                                 data-ad-slot="1234567890"
-                                 data-ad-format="auto"
-                                 data-full-width-responsive="true"></ins>
-                        </div>
+                        <!-- 광고 유닛은 데이터 로드 후에만 JavaScript로 동적 생성됩니다 -->
                     </div>
                 </div>
             </div>
@@ -766,36 +802,63 @@
     <script>
         // 애드센스 스크립트를 조건부로 로드하는 함수
         function loadAdSense() {
-            // 이미 로드되었는지 확인
-            if (document.querySelector('script[src*="adsbygoogle.js"]')) {
+            // 이미 광고가 있으면 스킵
+            if (document.getElementById('dashboardAd')) {
                 return;
             }
             
-            // 실제 데이터가 로드된 후에만 광고 스크립트 로드
-            const script = document.createElement('script');
-            script.async = true;
-            script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8530704724833439';
-            script.crossOrigin = 'anonymous';
+            // 광고 컨테이너가 있는지 확인 (matchesList 바로 뒤에 생성)
+            const matchesList = document.getElementById('matchesList');
+            if (!matchesList || !matchesList.parentElement) {
+                return;
+            }
             
-            // 스크립트 로드 완료 후 광고 유닛 활성화
-            script.onload = function() {
-                // 광고 컨테이너 표시
-                const adContainer = document.getElementById('dashboardAd');
-                if (adContainer) {
-                    adContainer.style.display = 'block';
-                }
+            // 광고 컨테이너 동적 생성
+            const adContainer = document.createElement('div');
+            adContainer.className = 'ad-container';
+            adContainer.id = 'dashboardAd';
+            
+            adContainer.innerHTML = `
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-8530704724833439"
+                     data-ad-slot="1234567890"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+            `;
+            
+            // matchesList 뒤에 삽입
+            matchesList.after(adContainer);
+            
+            // 광고 스크립트가 없으면 로드
+            if (!document.querySelector('script[src*="adsbygoogle.js"]')) {
+                const script = document.createElement('script');
+                script.async = true;
+                script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8530704724833439';
+                script.crossOrigin = 'anonymous';
                 
-                // 광고 유닛 초기화
+                script.onload = function() {
+                    // 스크립트 로드 후 광고 초기화
+                    setTimeout(() => {
+                        try {
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                            console.log('AdSense ad initialized');
+                        } catch (e) {
+                            console.log('AdSense initialization error:', e);
+                        }
+                    }, 500);
+                };
+                
+                document.head.appendChild(script);
+            } else {
+                // 이미 스크립트가 있으면 바로 초기화
                 try {
                     (adsbygoogle = window.adsbygoogle || []).push({});
+                    console.log('AdSense ad initialized');
                 } catch (e) {
                     console.log('AdSense initialization error:', e);
                 }
-                
-                console.log('AdSense script and ads loaded successfully');
-            };
-            
-            document.head.appendChild(script);
+            }
         }
         
         // 데이터 로드 완료 시 애드센스 로드
@@ -806,13 +869,50 @@
                 welcomeSection.style.display = 'none';
             }
             
-            // 애드센스 로드
-            setTimeout(loadAdSense, 1000); // 1초 후 로드하여 사용자 경험 개선
+            // 콘텐츠가 실제로 있을 때만 애드센스 로드
+            const playerInfo = document.getElementById('playerBasicInfo');
+            const matchesList = document.getElementById('matchesList');
+            
+            if (playerInfo && playerInfo.style.display !== 'none' && matchesList && matchesList.children.length > 0) {
+                setTimeout(loadAdSense, 1000); // 1초 후 로드하여 사용자 경험 개선
+            }
         }
         
         // 전역 함수로 등록
         window.onDataLoaded = onDataLoaded;
     </script>
+    
+    <!-- 요즘 나의 경기는? 팝업 -->
+    <div class="fun-data-popup-overlay" id="funDataPopup" style="display: none;">
+        <div class="fun-data-popup">
+            <div class="popup-header">
+                <h3>🎲 요즘 나의 경기는?</h3>
+                <button class="popup-close" onclick="closeFunDataPopup()">&times;</button>
+            </div>
+            
+            <div class="slider-container">
+                <button class="nav-btn prev-btn" id="prevBtn" onclick="previousCard()">‹</button>
+                
+                <div class="card-slider" id="cardSlider">
+                    <div class="card-wrapper" id="cardWrapper">
+                        <!-- 동적으로 생성되는 카드들 -->
+                    </div>
+                </div>
+                
+                <button class="nav-btn next-btn" id="nextBtn" onclick="nextCard()">›</button>
+            </div>
+            
+            <div class="slider-indicators" id="sliderIndicators">
+                <!-- 인디케이터들이 여기에 생성됩니다 -->
+            </div>
+            
+            <div class="popup-footer">
+                <button class="refresh-cards-btn" onclick="refreshFunDataCards()">
+                    🔄 다른 카드 보기
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 

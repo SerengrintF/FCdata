@@ -58,6 +58,7 @@ const loading = document.getElementById('loading');
 const errorSection = document.getElementById('errorSection');
 const errorMessage = document.getElementById('errorMessage');
 
+
 // 검색 드롭다운 관련 요소들
 const searchDropdown = document.getElementById('searchDropdown');
 const favoritesList = document.getElementById('favoritesList');
@@ -1280,5 +1281,536 @@ if (scrollToTopBtn) {
             behavior: 'smooth'
         });
     });
+}
+
+// ===== 요즘 나의 경기는? 카드 관련 함수들 =====
+
+// 요즘 나의 경기는? 카드 생성 함수
+function generateFunDataCards(matches) {
+    const cards = [];
+    const recentMatches = matches.slice(0, 10); // 최근 10경기
+    
+    if (recentMatches.length === 0) return cards;
+    
+    // 각 카드 타입별 조건 확인
+    const comebackWins = checkComebackWins(recentMatches);
+    if (comebackWins >= 2) {
+        cards.push({
+            type: 'comeback',
+            title: '승부사',
+            emoji: '🏆',
+            description: `당신은 진짜 승부사!<br>역전승 ${comebackWins}경기 달성`,
+            data: {
+                '역전승': `${comebackWins}경기`,
+                '역전승률': `${(comebackWins / recentMatches.length * 100).toFixed(1)}%`
+            }
+        });
+    }
+    
+    const cleanSheets = checkCleanSheets(recentMatches);
+    if (cleanSheets >= 3) {
+        cards.push({
+            type: 'defense',
+            title: '수비의 달인',
+            emoji: '🛡️',
+            description: `철벽 수비!<br>무실점 경기 ${cleanSheets}회 달성`,
+            data: {
+                '무실점': `${cleanSheets}경기`,
+                '클린시트율': `${(cleanSheets / recentMatches.length * 100).toFixed(1)}%`
+            }
+        });
+    }
+    
+    const avgGoals = calculateAvgGoals(recentMatches);
+    if (avgGoals >= 2.5) {
+        cards.push({
+            type: 'attack',
+            title: '공격의 화신',
+            emoji: '⚽',
+            description: `공격의 화신!<br>경기당 평균 ${avgGoals.toFixed(1)}골`,
+            data: {
+                '평균 득점': `${avgGoals.toFixed(1)}골`,
+                '총 득점': `${recentMatches.reduce((sum, match) => sum + (match.userGoals || 0), 0)}골`
+            }
+        });
+    }
+    
+    const winRate = calculateWinRate(recentMatches);
+    if (winRate >= 80) {
+        cards.push({
+            type: 'stability',
+            title: '안정성의 대가',
+            emoji: '📊',
+            description: `안정성의 대가!<br>승률 ${winRate.toFixed(1)}% 달성`,
+            data: {
+                '승률': `${winRate.toFixed(1)}%`,
+                '승리': `${recentMatches.filter(m => m.matchResult === 1).length}경기`
+            }
+        });
+    }
+    
+    const closeGames = checkCloseGames(recentMatches);
+    if (closeGames >= 6) {
+        cards.push({
+            type: 'dramatic',
+            title: '드라마틱',
+            emoji: '🎭',
+            description: `드라마틱한 경기들!<br>1점차 승부 ${closeGames}경기`,
+            data: {
+                '1점차 승부': `${closeGames}경기`,
+                '승부 비율': `${(closeGames / recentMatches.length * 100).toFixed(1)}%`
+            }
+        });
+    }
+    
+    const goalDifference = calculateGoalDifference(recentMatches);
+    if (goalDifference >= 10) {
+        cards.push({
+            type: 'balanced',
+            title: '균형잡힌 플레이어',
+            emoji: '⚖️',
+            description: `균형잡힌 플레이어!<br>득실차 +${goalDifference}`,
+            data: {
+                '득실차': `+${goalDifference}`,
+                '평균 득실차': `+${(goalDifference / recentMatches.length).toFixed(1)}`
+            }
+        });
+    }
+    
+    const firstHalfRate = checkFirstHalfGoals(recentMatches);
+    if (firstHalfRate >= 0.6) {
+        cards.push({
+            type: 'goldenTime',
+            title: '골든타임',
+            emoji: '⏰',
+            description: `당신의 골든타임은 전반전!<br>전반전 득점률 ${(firstHalfRate * 100).toFixed(1)}%`,
+            data: {
+                '전반전 득점률': `${(firstHalfRate * 100).toFixed(1)}%`,
+                '전반전 승률': `${checkFirstHalfWins(recentMatches).toFixed(1)}%`
+            }
+        });
+    }
+    
+    const shootingAccuracy = checkShootingAccuracy(recentMatches);
+    if (shootingAccuracy >= 35) {
+        cards.push({
+            type: 'shooting',
+            title: '슈팅 정확도 마스터',
+            emoji: '🎯',
+            description: `슈팅 정확도 마스터!<br>슈팅 성공률 ${shootingAccuracy.toFixed(1)}%`,
+            data: {
+                '슈팅 성공률': `${shootingAccuracy.toFixed(1)}%`,
+                '평균 슈팅': `${calculateAvgShots(recentMatches).toFixed(1)}개`
+            }
+        });
+    }
+    
+    const passAccuracy = checkPassAccuracy(recentMatches);
+    if (passAccuracy >= 80) {
+        cards.push({
+            type: 'passing',
+            title: '패스 마스터',
+            emoji: '🔄',
+            description: `패스 마스터!<br>패스 성공률 ${passAccuracy.toFixed(1)}%`,
+            data: {
+                '패스 성공률': `${passAccuracy.toFixed(1)}%`,
+                '평균 패스': `${calculateAvgPasses(recentMatches).toFixed(1)}개`
+            }
+        });
+    }
+    
+    const winStreak = checkWinStreak(recentMatches);
+    if (winStreak >= 4) {
+        cards.push({
+            type: 'streak',
+            title: '연승의 달인',
+            emoji: '🔥',
+            description: `연승의 달인!<br>최고 연승 ${winStreak}경기`,
+            data: {
+                '최고 연승': `${winStreak}경기`,
+                '현재 연승': `${getCurrentStreak(recentMatches)}경기`
+            }
+        });
+    }
+    
+    // 랜덤으로 5개 선택
+    return shuffleArray(cards).slice(0, 5);
+}
+
+// 배열 셔플 함수
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// 슬라이더 관련 전역 변수
+let currentCardIndex = 0;
+let totalCards = 0;
+let cardsData = [];
+
+// 팝업 표시
+function showFunDataCards() {
+    if (!currentUserInfo || !dashboardMatches) {
+        alert('경기 데이터가 없습니다.');
+        return;
+    }
+    
+    cardsData = generateFunDataCards(dashboardMatches);
+    totalCards = cardsData.length;
+    currentCardIndex = 0;
+    
+    const popup = document.getElementById('funDataPopup');
+    const wrapper = document.getElementById('cardWrapper');
+    const indicators = document.getElementById('sliderIndicators');
+    
+    if (cardsData.length === 0) {
+        wrapper.innerHTML = '<div class="no-cards">조건을 만족하는 데이터가 없습니다.<br>더 많은 경기를 플레이해보세요!</div>';
+        indicators.innerHTML = '';
+    } else {
+        // 카드들 생성
+        wrapper.innerHTML = cardsData.map(card => createCardHTML(card)).join('');
+        
+        // 인디케이터 생성
+        indicators.innerHTML = cardsData.map((_, index) => 
+            `<div class="indicator ${index === 0 ? 'active' : ''}" onclick="goToCard(${index})"></div>`
+        ).join('');
+        
+        // 첫 번째 카드로 이동
+        updateSlider();
+    }
+    
+    // 사이트 팝업 규칙 적용
+    popup.style.display = 'flex';
+    document.body.classList.add('modal-open');
+    
+    // 애니메이션을 위한 지연
+    setTimeout(() => {
+        popup.classList.add('show');
+    }, 10);
+    
+    // 키보드 이벤트 리스너 추가
+    document.addEventListener('keydown', handleSliderKeydown);
+    
+    // 오버레이 클릭으로 닫기
+    popup.addEventListener('click', function(e) {
+        if (e.target === popup) {
+            closeFunDataPopup();
+        }
+    });
+    
+    // Google Analytics 이벤트 전송
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'fun_data_cards_viewed', {
+            'event_category': 'user_interaction',
+            'event_label': 'Fun Data Cards',
+            'cards_count': cardsData.length
+        });
+    }
+}
+
+// 슬라이더 업데이트
+function updateSlider() {
+    const wrapper = document.getElementById('cardWrapper');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (!wrapper || totalCards === 0) return;
+    
+    // 카드 위치 이동 - 정확한 픽셀 단위로 이동
+    const cardWidth = wrapper.parentElement.offsetWidth;
+    wrapper.style.transform = `translateX(-${currentCardIndex * cardWidth}px)`;
+    
+    // 네비게이션 버튼 상태 업데이트
+    prevBtn.disabled = currentCardIndex === 0;
+    nextBtn.disabled = currentCardIndex === totalCards - 1;
+    
+    // 인디케이터 업데이트
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentCardIndex);
+    });
+}
+
+// 다음 카드로 이동
+function nextCard() {
+    if (currentCardIndex < totalCards - 1) {
+        currentCardIndex++;
+        updateSlider();
+        
+        // Google Analytics 이벤트 전송
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'card_navigation', {
+                'event_category': 'user_interaction',
+                'event_label': 'Next Card',
+                'card_index': currentCardIndex
+            });
+        }
+    }
+}
+
+// 이전 카드로 이동
+function previousCard() {
+    if (currentCardIndex > 0) {
+        currentCardIndex--;
+        updateSlider();
+        
+        // Google Analytics 이벤트 전송
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'card_navigation', {
+                'event_category': 'user_interaction',
+                'event_label': 'Previous Card',
+                'card_index': currentCardIndex
+            });
+        }
+    }
+}
+
+// 특정 카드로 이동
+function goToCard(index) {
+    if (index >= 0 && index < totalCards) {
+        currentCardIndex = index;
+        updateSlider();
+        
+        // Google Analytics 이벤트 전송
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'card_navigation', {
+                'event_category': 'user_interaction',
+                'event_label': 'Direct Card',
+                'card_index': currentCardIndex
+            });
+        }
+    }
+}
+
+// 팝업 닫기
+function closeFunDataPopup() {
+    const popup = document.getElementById('funDataPopup');
+    
+    // 사이트 팝업 규칙 적용
+    popup.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    
+    // 애니메이션 완료 후 숨기기
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 300);
+    
+    // 키보드 이벤트 리스너 제거
+    document.removeEventListener('keydown', handleSliderKeydown);
+}
+
+// 키보드 네비게이션 처리
+function handleSliderKeydown(event) {
+    const popup = document.getElementById('funDataPopup');
+    if (popup.style.display === 'none' || !popup.classList.contains('show')) return;
+    
+    switch(event.key) {
+        case 'ArrowLeft':
+            event.preventDefault();
+            previousCard();
+            break;
+        case 'ArrowRight':
+            event.preventDefault();
+            nextCard();
+            break;
+        case 'Escape':
+            event.preventDefault();
+            closeFunDataPopup();
+            break;
+    }
+}
+
+// 카드 새로고침
+function refreshFunDataCards() {
+    showFunDataCards();
+    
+    // Google Analytics 이벤트 전송
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'fun_data_cards_refreshed', {
+            'event_category': 'user_interaction',
+            'event_label': 'Fun Data Cards Refresh'
+        });
+    }
+}
+
+// 카드 HTML 생성
+function createCardHTML(card) {
+    return `
+        <div class="fun-data-card" data-type="${card.type}">
+            <div class="card-header">
+                <div class="card-header-content">
+                    <span class="card-emoji">${card.emoji}</span>
+                    <h3 class="card-title">${card.title}</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <p class="card-description">${card.description}</p>
+                <div class="card-stats">
+                    ${Object.entries(card.data).map(([key, value]) => `
+                        <div class="stat-item">
+                            <span class="stat-label">${key}</span>
+                            <span class="stat-value">${value}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="card-footer-text">데이터 분석 완료</div>
+            </div>
+        </div>
+    `;
+}
+
+// ===== 데이터 분석 함수들 =====
+
+// 역전승 확인
+function checkComebackWins(matches) {
+    return matches.filter(match => {
+        // 전반전에 뒤지다가 승리한 경우 (실제 데이터 구조에 맞게 조정 필요)
+        const userGoals = match.userGoals || 0;
+        const opponentGoals = match.opponentGoals || 0;
+        const matchResult = match.matchResult;
+        
+        // 간단한 역전승 로직: 실점이 있었지만 승리한 경우
+        return opponentGoals > 0 && matchResult === 1;
+    }).length;
+}
+
+// 무실점 경기 확인
+function checkCleanSheets(matches) {
+    return matches.filter(match => {
+        const opponentGoals = match.opponentGoals || 0;
+        return opponentGoals === 0;
+    }).length;
+}
+
+// 평균 득점 계산
+function calculateAvgGoals(matches) {
+    const totalGoals = matches.reduce((sum, match) => sum + (match.userGoals || 0), 0);
+    return matches.length > 0 ? totalGoals / matches.length : 0;
+}
+
+// 승률 계산
+function calculateWinRate(matches) {
+    const wins = matches.filter(match => match.matchResult === 1).length;
+    return matches.length > 0 ? (wins / matches.length) * 100 : 0;
+}
+
+// 1점차 승부 확인
+function checkCloseGames(matches) {
+    return matches.filter(match => {
+        const userGoals = match.userGoals || 0;
+        const opponentGoals = match.opponentGoals || 0;
+        return Math.abs(userGoals - opponentGoals) === 1;
+    }).length;
+}
+
+// 득실차 계산
+function calculateGoalDifference(matches) {
+    const totalGoals = matches.reduce((sum, match) => sum + (match.userGoals || 0), 0);
+    const totalConceded = matches.reduce((sum, match) => sum + (match.opponentGoals || 0), 0);
+    return totalGoals - totalConceded;
+}
+
+// 전반전 득점 비율 확인
+function checkFirstHalfGoals(matches) {
+    // 실제 데이터에서 전반전 득점 정보가 있다면 사용, 없으면 전체 득점의 50%로 가정
+    const totalGoals = matches.reduce((sum, match) => sum + (match.userGoals || 0), 0);
+    const firstHalfGoals = Math.floor(totalGoals * 0.5); // 임시로 50% 가정
+    return totalGoals > 0 ? firstHalfGoals / totalGoals : 0;
+}
+
+// 전반전 승률 계산
+function checkFirstHalfWins(matches) {
+    // 전반전 승률 계산 (실제 데이터 구조에 맞게 조정 필요)
+    return 60; // 임시값
+}
+
+// 슈팅 정확도 확인
+function checkShootingAccuracy(matches) {
+    let totalShots = 0;
+    let totalGoals = 0;
+    
+    matches.forEach(match => {
+        if (match.userStats && match.userStats.shoot) {
+            totalShots += match.userStats.shoot.shootTotal || 0;
+            totalGoals += match.userStats.shoot.goalTotal || 0;
+        }
+    });
+    
+    return totalShots > 0 ? (totalGoals / totalShots) * 100 : 0;
+}
+
+// 패스 정확도 확인
+function checkPassAccuracy(matches) {
+    let totalPasses = 0;
+    let successfulPasses = 0;
+    
+    matches.forEach(match => {
+        if (match.userStats && match.userStats.pass) {
+            totalPasses += match.userStats.pass.passTry || 0;
+            successfulPasses += match.userStats.pass.passSuccess || 0;
+        }
+    });
+    
+    return totalPasses > 0 ? (successfulPasses / totalPasses) * 100 : 0;
+}
+
+// 평균 슈팅 수 계산
+function calculateAvgShots(matches) {
+    let totalShots = 0;
+    matches.forEach(match => {
+        if (match.userStats && match.userStats.shoot) {
+            totalShots += match.userStats.shoot.shootTotal || 0;
+        }
+    });
+    return matches.length > 0 ? totalShots / matches.length : 0;
+}
+
+// 평균 패스 수 계산
+function calculateAvgPasses(matches) {
+    let totalPasses = 0;
+    matches.forEach(match => {
+        if (match.userStats && match.userStats.pass) {
+            totalPasses += match.userStats.pass.passTry || 0;
+        }
+    });
+    return matches.length > 0 ? totalPasses / matches.length : 0;
+}
+
+// 연승 확인
+function checkWinStreak(matches) {
+    let maxStreak = 0;
+    let currentStreak = 0;
+    
+    for (let i = matches.length - 1; i >= 0; i--) {
+        if (matches[i].matchResult === 1) {
+            currentStreak++;
+            maxStreak = Math.max(maxStreak, currentStreak);
+        } else {
+            currentStreak = 0;
+        }
+    }
+    
+    return maxStreak;
+}
+
+// 현재 연승 확인
+function getCurrentStreak(matches) {
+    let currentStreak = 0;
+    
+    for (let i = matches.length - 1; i >= 0; i--) {
+        if (matches[i].matchResult === 1) {
+            currentStreak++;
+        } else {
+            break;
+        }
+    }
+    
+    return currentStreak;
 }
 

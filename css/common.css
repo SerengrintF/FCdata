@@ -898,14 +898,14 @@ body.modal-open {
     transform: translateY(0);
 }
 
-/* 로딩 스타일 - 박스 제거 */
+/* 로딩 스타일 - 박스 없이 텍스트와 애니메이션만 */
 .loading {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
     padding: 0;
-    margin: 0;
+    margin: 20px auto;
     color: var(--text-accent);
     font-size: 14px;
     font-weight: 500;
@@ -1559,6 +1559,709 @@ body.modal-open {
     .scroll-to-top svg {
         width: 20px;
         height: 20px;
+    }
+}
+
+/* 요즘 나의 경기는? 버튼 스타일 */
+.fun-data-section {
+    display: none;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.fun-data-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.fun-data-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.fun-data-btn:active {
+    transform: translateY(0);
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+.btn-text {
+    font-size: 14px;
+}
+
+/* 요즘 나의 경기는? 팝업 스타일 - 사이트 팝업 규칙 적용 */
+.fun-data-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.fun-data-popup-overlay.show {
+    opacity: 1;
+}
+
+.fun-data-popup {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    max-width: 600px;
+    max-height: 80vh;
+    width: 90%;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.fun-data-popup-overlay.show .fun-data-popup {
+    transform: scale(1);
+}
+
+.fun-data-popup .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.fun-data-popup .popup-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.fun-data-popup .popup-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-normal);
+}
+
+.fun-data-popup .popup-close:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+/* 슬라이더 컨테이너 */
+.slider-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    min-height: 400px;
+}
+
+.card-slider {
+    width: 100%;
+    max-width: 400px;
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto;
+}
+
+.card-wrapper {
+    display: flex;
+    transition: transform 0.3s ease;
+    width: 100%;
+    height: 100%;
+}
+
+/* 요즘 나의 경기는? 카드 - 깔끔한 플레이어 카드 디자인 */
+.fun-data-card {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    min-height: 400px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.fun-data-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.fun-data-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+    pointer-events: none;
+}
+
+/* 네비게이션 버튼 */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.nav-btn:hover {
+    background: var(--bg-accent);
+    color: #000;
+    border-color: var(--bg-accent);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: translateY(-50%);
+}
+
+.nav-btn:disabled:hover {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+    transform: translateY(-50%);
+}
+
+.prev-btn {
+    left: 20px;
+}
+
+.next-btn {
+    right: 20px;
+}
+
+/* 슬라이더 인디케이터 */
+.slider-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 20px;
+}
+
+.indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: var(--bg-accent);
+    transform: scale(1.2);
+}
+
+.indicator:hover {
+    background: var(--text-secondary);
+}
+
+/* 카드 상단 - CLUB NAME 영역 */
+.fun-data-card .card-header {
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%);
+    padding: 16px 20px;
+    margin: 0;
+    position: relative;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 상단 우측 번호 영역 - 기본 색상 */
+.fun-data-card .card-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 100%;
+    background: #667eea;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 20px 100%);
+}
+
+/* 카드 타입별 다양한 색상 */
+.fun-data-card[data-type="comeback"] .card-header::after {
+    background: #e74c3c;
+}
+
+.fun-data-card[data-type="defense"] .card-header::after {
+    background: #3498db;
+}
+
+.fun-data-card[data-type="attack"] .card-header::after {
+    background: #e67e22;
+}
+
+.fun-data-card[data-type="stability"] .card-header::after {
+    background: #27ae60;
+}
+
+.fun-data-card[data-type="dramatic"] .card-header::after {
+    background: #9b59b6;
+}
+
+.fun-data-card[data-type="balanced"] .card-header::after {
+    background: #34495e;
+}
+
+.fun-data-card[data-type="goldenTime"] .card-header::after {
+    background: #f39c12;
+}
+
+.fun-data-card[data-type="shooting"] .card-header::after {
+    background: #e91e63;
+}
+
+.fun-data-card[data-type="passing"] .card-header::after {
+    background: #00bcd4;
+}
+
+.fun-data-card[data-type="streak"] .card-header::after {
+    background: #ff5722;
+}
+
+/* 상단 우측 번호 텍스트 제거 */
+
+.fun-data-card .card-header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+}
+
+
+.fun-data-card .card-description {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #b0b0b0;
+    font-weight: 500;
+    text-align: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fun-data-card .card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+}
+
+.fun-data-card .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.fun-data-card .stat-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+}
+
+.fun-data-card .stat-label {
+    font-size: 12px;
+    color: #b0b0b0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.fun-data-card .stat-value {
+    font-size: 18px;
+    color: #e0e0e0;
+    font-weight: 700;
+    text-shadow: none;
+}
+
+.fun-data-card .card-emoji {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.fun-data-card .card-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+}
+
+/* 카드 중앙 콘텐츠 영역 - 어두운 톤, 도형 제거 */
+.fun-data-card .card-content {
+    padding: 40px 30px;
+    background: #2a2a2a;
+    color: #e0e0e0;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 250px;
+    margin: 20px;
+    border-radius: 8px;
+}
+
+.fun-data-card .card-description {
+    margin: 0 0 24px 0;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: center;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(58, 58, 58, 0.6) 50%, rgba(42, 42, 42, 0.8) 100%);
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.fun-data-card .card-description::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.fun-data-card .card-description:hover::before {
+    left: 100%;
+}
+
+.fun-data-card .card-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fun-data-card .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fun-data-card .stat-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+}
+
+.fun-data-card .stat-label {
+    font-size: 14px;
+    color: #b0b0b0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.fun-data-card .stat-value {
+    font-size: 16px;
+    color: #e0e0e0;
+    font-weight: 700;
+    text-shadow: none;
+}
+
+/* 카드 하단 - 상단 타이틀 색상과 통일 */
+.fun-data-card .card-footer {
+    background: linear-gradient(135deg, #667eea 0%, #7c8ef0 50%, #667eea 100%);
+    padding: 16px 20px;
+    margin: 0;
+    border-radius: 0 0 12px 12px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    clip-path: polygon(20px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* 카드 타입별 하단 색상 - 그라데이션 적용 */
+.fun-data-card[data-type="comeback"] .card-footer {
+    background: linear-gradient(135deg, #e74c3c 0%, #f16565 50%, #e74c3c 100%);
+}
+
+.fun-data-card[data-type="defense"] .card-footer {
+    background: linear-gradient(135deg, #3498db 0%, #5dade2 50%, #3498db 100%);
+}
+
+.fun-data-card[data-type="attack"] .card-footer {
+    background: linear-gradient(135deg, #e67e22 0%, #f39c12 50%, #e67e22 100%);
+}
+
+.fun-data-card[data-type="stability"] .card-footer {
+    background: linear-gradient(135deg, #27ae60 0%, #58d68d 50%, #27ae60 100%);
+}
+
+.fun-data-card[data-type="dramatic"] .card-footer {
+    background: linear-gradient(135deg, #9b59b6 0%, #bb8fce 50%, #9b59b6 100%);
+}
+
+.fun-data-card[data-type="balanced"] .card-footer {
+    background: linear-gradient(135deg, #34495e 0%, #5d6d7e 50%, #34495e 100%);
+}
+
+.fun-data-card[data-type="goldenTime"] .card-footer {
+    background: linear-gradient(135deg, #f39c12 0%, #f7dc6f 50%, #f39c12 100%);
+}
+
+.fun-data-card[data-type="shooting"] .card-footer {
+    background: linear-gradient(135deg, #e91e63 0%, #f48fb1 50%, #e91e63 100%);
+}
+
+.fun-data-card[data-type="passing"] .card-footer {
+    background: linear-gradient(135deg, #00bcd4 0%, #4dd0e1 50%, #00bcd4 100%);
+}
+
+.fun-data-card[data-type="streak"] .card-footer {
+    background: linear-gradient(135deg, #ff5722 0%, #ff8a65 50%, #ff5722 100%);
+}
+
+.fun-data-card .card-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+.fun-data-card .card-footer-text {
+    display: none;
+}
+
+/* 카드 타입별 색상 제거 - 통일된 디자인 */
+
+.popup-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.refresh-cards-btn {
+    background: var(--bg-accent);
+    color: #000;
+    border: 1px solid var(--bg-accent);
+    border-radius: var(--radius-md);
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.refresh-cards-btn:hover {
+    background: transparent;
+    color: var(--bg-accent);
+}
+
+.no-cards {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+/* 사이트 통계 섹션 스타일 */
+.site-stats-section {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.site-stats-section h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.stat-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all var(--transition-normal);
+}
+
+.stat-item:hover {
+    border-color: var(--border-accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-accent);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* 인기 검색어 섹션 스타일 */
+.popular-searches-section {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.popular-searches-section h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+}
+
+.popular-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.popular-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.popular-item:hover {
+    background: var(--bg-accent);
+    color: var(--text-inverse);
+    border-color: var(--bg-accent);
+    transform: translateY(-2px);
+}
+
+.loading-text {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    padding: 1rem;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-item {
+        padding: 1.25rem;
     }
 }
 
