@@ -1433,8 +1433,224 @@ function generateFunDataCards(matches) {
         });
     }
     
-    // 랜덤으로 5개 선택
-    return shuffleArray(cards).slice(0, 5);
+    // 헤딩골 전문가
+    const headingGoals = checkHeadingGoals(recentMatches);
+    const totalGoals = recentMatches.reduce((sum, m) => sum + (m.userStats?.shoot?.goalTotal || 0), 0);
+    if (headingGoals >= 2 && totalGoals > 0) {
+        cards.push({
+            type: 'heading',
+            title: '헤딩의 달인',
+            emoji: '💥',
+            description: `헤딩골 전문가!<br>헤딩골 ${headingGoals}골 달성`,
+            data: {
+                '헤딩골': `${headingGoals}골`,
+                '헤딩골 비율': `${(headingGoals / totalGoals * 100).toFixed(1)}%`
+            }
+        });
+    }
+    
+    // 프리킥 전문가
+    const freekickGoals = checkFreekickGoals(recentMatches);
+    if (freekickGoals >= 1) {
+        cards.push({
+            type: 'freekick',
+            title: '프리킥 마스터',
+            emoji: '⚡',
+            description: `프리킥 전문가!<br>프리킥 골 ${freekickGoals}골`,
+            data: {
+                '프리킥 골': `${freekickGoals}골`,
+                '경기당 FP': `${(freekickGoals / recentMatches.length).toFixed(2)}골`
+            }
+        });
+    }
+    
+    // 패널티킥 전문가
+    const penaltyGoals = checkPenaltyGoals(recentMatches);
+    if (penaltyGoals >= 1) {
+        cards.push({
+            type: 'penalty',
+            title: 'PK 전문가',
+            emoji: '🎯',
+            description: `PK 킥의 달인!<br>패널티킥 골 ${penaltyGoals}골`,
+            data: {
+                'PK 골': `${penaltyGoals}골`,
+                '경기당 PK': `${(penaltyGoals / recentMatches.length).toFixed(2)}골`
+            }
+        });
+    }
+    
+    // 수비의 달인 (블록 + 태클)
+    const defenseSuccess = checkDefenseSuccess(recentMatches);
+    if (defenseSuccess >= 20) {
+        cards.push({
+            type: 'defense_master',
+            title: '수비의 달인',
+            emoji: '🛡️',
+            description: `철벽 수비!<br>블록+태클 성공 ${defenseSuccess}회`,
+            data: {
+                '수비 성공': `${defenseSuccess}회`,
+                '평균 수비': `${(defenseSuccess / recentMatches.length).toFixed(1)}회`
+            }
+        });
+    }
+    
+    // 블록 전문가
+    const blockSuccess = checkBlockSuccess(recentMatches);
+    if (blockSuccess >= 12) {
+        cards.push({
+            type: 'block',
+            title: '블록 마스터',
+            emoji: '🛡️',
+            description: `블록킹 전문가!<br>블록 성공 ${blockSuccess}회`,
+            data: {
+                '블록 성공': `${blockSuccess}회`,
+                '평균 블록': `${(blockSuccess / recentMatches.length).toFixed(1)}회`
+            }
+        });
+    }
+    
+    // 태클 전문가
+    const tackleSuccess = checkTackleSuccess(recentMatches);
+    if (tackleSuccess >= 15) {
+        cards.push({
+            type: 'tackle',
+            title: '태클 마스터',
+            emoji: '⚔️',
+            description: `태클 전문가!<br>태클 성공 ${tackleSuccess}회`,
+            data: {
+                '태클 성공': `${tackleSuccess}회`,
+                '평균 태클': `${(tackleSuccess / recentMatches.length).toFixed(1)}회`
+            }
+        });
+    }
+    
+    // 오프사이드 주의
+    const offsides = checkOffsides(recentMatches);
+    if (offsides >= 8) {
+        cards.push({
+            type: 'offside',
+            title: '오프사이드 주의',
+            emoji: '🚨',
+            description: `오프사이드 빈번!<br>총 ${offsides}회 오프사이드`,
+            data: {
+                '오프사이드': `${offsides}회`,
+                '평균 오프사이드': `${(offsides / recentMatches.length).toFixed(1)}회`
+            }
+        });
+    }
+    
+    // 자책골 주의
+    const ownGoals = checkOwnGoals(recentMatches);
+    if (ownGoals >= 1) {
+        const totalUserGoals = recentMatches.reduce((sum, m) => sum + (m.userGoals || 0), 0);
+        const ownGoalData = {};
+        ownGoalData['자책골'] = `${ownGoals}골`;
+        if (totalUserGoals > 0) {
+            ownGoalData['자책골 비율'] = `${(ownGoals / totalUserGoals * 100).toFixed(1)}%`;
+        } else {
+            ownGoalData['총 경기'] = `${recentMatches.length}경기`;
+        }
+        cards.push({
+            type: 'own_goal',
+            title: '자책골 주의',
+            emoji: '😅',
+            description: `실수는 인생의 양념!<br>자책골 ${ownGoals}골`,
+            data: ownGoalData
+        });
+    }
+    
+    // 발리킥 마스터
+    const volleyGoals = checkVolleyGoals(recentMatches);
+    if (volleyGoals >= 1) {
+        cards.push({
+            type: 'volley',
+            title: '발리킥 마스터',
+            emoji: '🔥',
+            description: `발리킥 전문가!<br>발리 골 ${volleyGoals}골`,
+            data: {
+                '발리 골': `${volleyGoals}골`,
+                '경기당 발리': `${(volleyGoals / recentMatches.length).toFixed(2)}골`
+            }
+        });
+    }
+    
+    // 바이시클 킥
+    const bicycleGoals = checkBicycleGoals(recentMatches);
+    if (bicycleGoals >= 1) {
+        cards.push({
+            type: 'bicycle',
+            title: '바이시클 킥',
+            emoji: '🤸',
+            description: `역동적인 플레이어!<br>바이시클킥 골 ${bicycleGoals}골`,
+            data: {
+                '바이시클 킥': `${bicycleGoals}골`,
+                '경기당 바이시클': `${(bicycleGoals / recentMatches.length).toFixed(2)}골`
+            }
+        });
+    }
+    
+    // 파워슛 마스터
+    const powerShootGoals = checkPowerShootGoals(recentMatches);
+    if (powerShootGoals >= 2) {
+        cards.push({
+            type: 'power_shoot',
+            title: '파워슛 마스터',
+            emoji: '💨',
+            description: `강력한 슈팅!<br>파워슛 골 ${powerShootGoals}골`,
+            data: {
+                '파워슛 골': `${powerShootGoals}골`,
+                '경기당 파워슛': `${(powerShootGoals / recentMatches.length).toFixed(2)}골`
+            }
+        });
+    }
+    
+    // 골포스트 맞춤
+    const hitPostCount = checkHitPost(recentMatches);
+    if (hitPostCount >= 3) {
+        cards.push({
+            type: 'unlucky',
+            title: '운이 없는 날',
+            emoji: '😔',
+            description: `아깝습니다!<br>골포스트 ${hitPostCount}회 맞춤`,
+            data: {
+                '골포스트': `${hitPostCount}회`,
+                '평균': `${(hitPostCount / recentMatches.length).toFixed(1)}회`
+            }
+        });
+    }
+    
+    // 근거리 골 전문가
+    const closeRangeGoals = checkCloseRangeGoals(recentMatches);
+    if (closeRangeGoals >= 8 && totalGoals > 0) {
+        cards.push({
+            type: 'close_range',
+            title: '근거리 전문가',
+            emoji: '⚽',
+            description: `박스 안 마무리!<br>근거리 골 ${closeRangeGoals}골`,
+            data: {
+                '근거리 골': `${closeRangeGoals}골`,
+                '근거리 비율': `${(closeRangeGoals / totalGoals * 100).toFixed(1)}%`
+            }
+        });
+    }
+    
+    // 중거리 골 전문가
+    const midRangeGoals = checkMidRangeGoals(recentMatches);
+    if (midRangeGoals >= 5 && totalGoals > 0) {
+        cards.push({
+            type: 'mid_range',
+            title: '중거리 전문가',
+            emoji: '🚀',
+            description: `장거리 슈팅!<br>중거리 골 ${midRangeGoals}골`,
+            data: {
+                '중거리 골': `${midRangeGoals}골`,
+                '중거리 비율': `${(midRangeGoals / totalGoals * 100).toFixed(1)}%`
+            }
+        });
+    }
+    
+    // 랜덤으로 10개 선택 (기존 5개에서 증가)
+    return shuffleArray(cards).slice(0, 10);
 }
 
 // 배열 셔플 함수
@@ -1812,5 +2028,122 @@ function getCurrentStreak(matches) {
     }
     
     return currentStreak;
+}
+
+// 헤딩골 확인
+function checkHeadingGoals(matches) {
+    return matches.reduce((sum, match) => {
+        return sum + (match.userStats?.shoot?.goalHeading || 0);
+    }, 0);
+}
+
+// 프리킥 골 확인
+function checkFreekickGoals(matches) {
+    return matches.reduce((sum, match) => {
+        return sum + (match.userStats?.shoot?.goalFreeKick || 0);
+    }, 0);
+}
+
+// 패널티킥 골 확인
+function checkPenaltyGoals(matches) {
+    return matches.reduce((sum, match) => {
+        return sum + (match.userStats?.shoot?.goalPenaltyKick || 0);
+    }, 0);
+}
+
+// 수비 성공 확인 (블록 + 태클)
+function checkDefenseSuccess(matches) {
+    return matches.reduce((sum, match) => {
+        const defence = match.userStats?.defence || {};
+        return sum + (defence.blockSuccess || 0) + (defence.tackleSuccess || 0);
+    }, 0);
+}
+
+// 블록 성공 확인
+function checkBlockSuccess(matches) {
+    return matches.reduce((sum, match) => {
+        return sum + (match.userStats?.defence?.blockSuccess || 0);
+    }, 0);
+}
+
+// 태클 성공 확인
+function checkTackleSuccess(matches) {
+    return matches.reduce((sum, match) => {
+        return sum + (match.userStats?.defence?.tackleSuccess || 0);
+    }, 0);
+}
+
+// 오프사이드 확인
+function checkOffsides(matches) {
+    return matches.reduce((sum, match) => {
+        // API 필드명 확인 필요 (OffsideCount 또는 다른 이름일 수 있음)
+        return sum + (match.userStats?.OffsideCount || match.userStats?.offsideCount || match.userStats?.pass?.offsideCount || 0);
+    }, 0);
+}
+
+// 자책골 확인
+function checkOwnGoals(matches) {
+    return matches.reduce((sum, match) => {
+        // API 필드명 확인 필요
+        return sum + (match.userStats?.ownGoal || match.userStats?.shoot?.ownGoal || 0);
+    }, 0);
+}
+
+// 발리 골 확인 (shootDetail이 있는 경우)
+function checkVolleyGoals(matches) {
+    return matches.reduce((sum, match) => {
+        const shootDetail = match.userStats?.shoot?.shootDetail;
+        if (typeof shootDetail === 'object' && shootDetail !== null) {
+            return sum + (shootDetail.volley || 0);
+        }
+        return sum;
+    }, 0);
+}
+
+// 바이시클킥 골 확인
+function checkBicycleGoals(matches) {
+    return matches.reduce((sum, match) => {
+        const shootDetail = match.userStats?.shoot?.shootDetail;
+        if (typeof shootDetail === 'object' && shootDetail !== null) {
+            return sum + (shootDetail.BICYCLE || shootDetail.bicycle || 0);
+        }
+        return sum;
+    }, 0);
+}
+
+// 파워슛 확인
+function checkPowerShootGoals(matches) {
+    return matches.reduce((sum, match) => {
+        const shootDetail = match.userStats?.shoot?.shootDetail;
+        if (typeof shootDetail === 'object' && shootDetail !== null) {
+            return sum + (shootDetail.super || shootDetail.powerShoot || 0);
+        }
+        return sum;
+    }, 0);
+}
+
+// 골포스트 맞춤 확인
+function checkHitPost(matches) {
+    return matches.reduce((sum, match) => {
+        const shootDetail = match.userStats?.shoot?.shootDetail;
+        if (typeof shootDetail === 'object' && shootDetail !== null) {
+            return sum + (shootDetail.hitPost || shootDetail.post || 0);
+        }
+        return sum;
+    }, 0);
+}
+
+// 근거리 골 확인
+function checkCloseRangeGoals(matches) {
+    return matches.reduce((sum, match) => {
+        return sum + (match.userStats?.shoot?.goalInPenalty || 0);
+    }, 0);
+}
+
+// 중거리 골 확인
+function checkMidRangeGoals(matches) {
+    return matches.reduce((sum, match) => {
+        return sum + (match.userStats?.shoot?.goalOutPenalty || 0);
+    }, 0);
 }
 

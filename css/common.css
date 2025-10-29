@@ -1564,7 +1564,7 @@ body.modal-open {
 
 /* 요즘 나의 경기는? 버튼 스타일 */
 .fun-data-section {
-    display: none;
+    display: block;
     padding: 12px 16px;
     border-top: 1px solid var(--border-color);
 }
@@ -1874,6 +1874,62 @@ body.modal-open {
     background: #ff5722;
 }
 
+.fun-data-card[data-type="heading"] .card-header::after {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+}
+
+.fun-data-card[data-type="freekick"] .card-header::after {
+    background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+}
+
+.fun-data-card[data-type="penalty"] .card-header::after {
+    background: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+}
+
+.fun-data-card[data-type="defense_master"] .card-header::after {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.fun-data-card[data-type="block"] .card-header::after {
+    background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+}
+
+.fun-data-card[data-type="tackle"] .card-header::after {
+    background: linear-gradient(135deg, #8B4513 0%, #CD853F 100%);
+}
+
+.fun-data-card[data-type="offside"] .card-header::after {
+    background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+}
+
+.fun-data-card[data-type="own_goal"] .card-header::after {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+}
+
+.fun-data-card[data-type="volley"] .card-header::after {
+    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+}
+
+.fun-data-card[data-type="bicycle"] .card-header::after {
+    background: linear-gradient(135deg, #00F260 0%, #0575E6 100%);
+}
+
+.fun-data-card[data-type="power_shoot"] .card-header::after {
+    background: linear-gradient(135deg, #8360c3 0%, #2ebf91 100%);
+}
+
+.fun-data-card[data-type="unlucky"] .card-header::after {
+    background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+}
+
+.fun-data-card[data-type="close_range"] .card-header::after {
+    background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+}
+
+.fun-data-card[data-type="mid_range"] .card-header::after {
+    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+}
+
 /* 상단 우측 번호 텍스트 제거 */
 
 .fun-data-card .card-header-content {
@@ -2094,6 +2150,62 @@ body.modal-open {
 
 .fun-data-card[data-type="streak"] .card-footer {
     background: linear-gradient(135deg, #ff5722 0%, #ff8a65 50%, #ff5722 100%);
+}
+
+.fun-data-card[data-type="heading"] .card-footer {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 50%, #FF6B6B 100%);
+}
+
+.fun-data-card[data-type="freekick"] .card-footer {
+    background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 50%, #4ECDC4 100%);
+}
+
+.fun-data-card[data-type="penalty"] .card-footer {
+    background: linear-gradient(135deg, #F093FB 0%, #F5576C 50%, #F093FB 100%);
+}
+
+.fun-data-card[data-type="defense_master"] .card-footer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+}
+
+.fun-data-card[data-type="block"] .card-footer {
+    background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 50%, #2193b0 100%);
+}
+
+.fun-data-card[data-type="tackle"] .card-footer {
+    background: linear-gradient(135deg, #8B4513 0%, #CD853F 50%, #8B4513 100%);
+}
+
+.fun-data-card[data-type="offside"] .card-footer {
+    background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 50%, #FF416C 100%);
+}
+
+.fun-data-card[data-type="own_goal"] .card-footer {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
+}
+
+.fun-data-card[data-type="volley"] .card-footer {
+    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FF6B35 100%);
+}
+
+.fun-data-card[data-type="bicycle"] .card-footer {
+    background: linear-gradient(135deg, #00F260 0%, #0575E6 50%, #00F260 100%);
+}
+
+.fun-data-card[data-type="power_shoot"] .card-footer {
+    background: linear-gradient(135deg, #8360c3 0%, #2ebf91 50%, #8360c3 100%);
+}
+
+.fun-data-card[data-type="unlucky"] .card-footer {
+    background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 50%, #bdc3c7 100%);
+}
+
+.fun-data-card[data-type="close_range"] .card-footer {
+    background: linear-gradient(135deg, #f12711 0%, #f5af19 50%, #f12711 100%);
+}
+
+.fun-data-card[data-type="mid_range"] .card-footer {
+    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 50%, #00c6ff 100%);
 }
 
 .fun-data-card .card-footer::before {

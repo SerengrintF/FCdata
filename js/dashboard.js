@@ -1684,6 +1684,11 @@ function showError(message) {
     errorSection.style.display = 'block';
     playerBasicInfo.style.display = 'none';
     tabContainer.style.display = 'none';
+    
+    // 에러 표시 시 광고 제거
+    if (typeof window.removeAdSense === 'function') {
+        window.removeAdSense();
+    }
 }
 
 function hideError() {

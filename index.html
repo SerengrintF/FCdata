@@ -267,7 +267,7 @@
                 </div>
                 
                 <!-- 요즘 나의 경기는? 버튼 -->
-                <div class="fun-data-section">
+                <div class="fun-data-section" style="display: none;">
                     <button class="fun-data-btn" id="funDataBtn" onclick="showFunDataCards()">
                         <span class="btn-icon">🎲</span>
                         <span class="btn-text">요즘 나의 경기는?</span>
@@ -800,10 +800,38 @@
     
     <!-- 애드센스 조건부 로딩 스크립트 -->
     <script>
+        // 광고 제거 함수 (전역 함수로 노출)
+        window.removeAdSense = function() {
+            const adContainer = document.getElementById('dashboardAd');
+            if (adContainer) {
+                adContainer.remove();
+            }
+            
+            // 광고 스크립트도 제거 (선택적)
+            const adScript = document.querySelector('script[src*="adsbygoogle.js"]');
+            if (adScript) {
+                // 스크립트는 제거하지 않고, 광고 컨테이너만 제거
+                // (스크립트 재사용을 위해 유지)
+            }
+        };
+        
         // 애드센스 스크립트를 조건부로 로드하는 함수
         function loadAdSense() {
             // 이미 광고가 있으면 스킵
             if (document.getElementById('dashboardAd')) {
+                return;
+            }
+            
+            // 에러 섹션이 표시되어 있으면 광고를 로드하지 않음
+            const errorSection = document.getElementById('errorSection');
+            if (errorSection && errorSection.style.display !== 'none') {
+                window.removeAdSense();
+                return;
+            }
+            
+            // 환영 섹션이 아직 표시되어 있으면 광고를 로드하지 않음
+            const welcomeSection = document.getElementById('welcomeSection');
+            if (welcomeSection && welcomeSection.style.display !== 'none') {
                 return;
             }
             
@@ -813,7 +841,33 @@
                 return;
             }
             
-            // 광고 컨테이너 동적 생성
+            // 실제 경기 데이터가 있는지 확인 (.match-item 요소가 있어야 함)
+            const matchItems = matchesList.querySelectorAll('.match-item');
+            if (!matchItems || matchItems.length === 0) {
+                return;
+            }
+            
+            // 최소 경기 수 확인 (최소 1개 이상의 실제 경기 데이터)
+            let validMatchCount = 0;
+            matchItems.forEach(item => {
+                // 실제 경기 데이터가 있는지 확인 (no-matches 메시지가 아닌)
+                if (!item.classList.contains('no-matches') && 
+                    !item.textContent.includes('경기 기록이 없습니다')) {
+                    validMatchCount++;
+                }
+            });
+            
+            if (validMatchCount === 0) {
+                return;
+            }
+            
+            // 플레이어 정보가 표시되어 있는지 확인
+            const playerInfo = document.getElementById('playerBasicInfo');
+            if (!playerInfo || playerInfo.style.display === 'none') {
+                return;
+            }
+            
+            // 모든 조건을 통과한 경우에만 광고 로드
             const adContainer = document.createElement('div');
             adContainer.className = 'ad-container';
             adContainer.id = 'dashboardAd';
@@ -842,7 +896,7 @@
                     setTimeout(() => {
                         try {
                             (adsbygoogle = window.adsbygoogle || []).push({});
-                            console.log('AdSense ad initialized');
+                            console.log('AdSense ad initialized with', validMatchCount, 'valid matches');
                         } catch (e) {
                             console.log('AdSense initialization error:', e);
                         }
@@ -854,7 +908,7 @@
                 // 이미 스크립트가 있으면 바로 초기화
                 try {
                     (adsbygoogle = window.adsbygoogle || []).push({});
-                    console.log('AdSense ad initialized');
+                    console.log('AdSense ad initialized with', validMatchCount, 'valid matches');
                 } catch (e) {
                     console.log('AdSense initialization error:', e);
                 }
@@ -869,12 +923,46 @@
                 welcomeSection.style.display = 'none';
             }
             
+            // 에러 섹션이 표시되어 있으면 광고를 제거하고 로드하지 않음
+            const errorSection = document.getElementById('errorSection');
+            if (errorSection && errorSection.style.display !== 'none') {
+                window.removeAdSense();
+                return;
+            }
+            
             // 콘텐츠가 실제로 있을 때만 애드센스 로드
             const playerInfo = document.getElementById('playerBasicInfo');
             const matchesList = document.getElementById('matchesList');
             
-            if (playerInfo && playerInfo.style.display !== 'none' && matchesList && matchesList.children.length > 0) {
+            if (!playerInfo || playerInfo.style.display === 'none') {
+                window.removeAdSense();
+                return;
+            }
+            
+            if (!matchesList) {
+                window.removeAdSense();
+                return;
+            }
+            
+            // 실제 경기 데이터가 있는지 확인 (.match-item 요소가 있어야 함)
+            const matchItems = matchesList.querySelectorAll('.match-item');
+            let validMatchCount = 0;
+            
+            matchItems.forEach(item => {
+                // 실제 경기 데이터가 있는지 확인
+                if (!item.classList.contains('no-matches') && 
+                    !item.textContent.includes('경기 기록이 없습니다') &&
+                    !item.textContent.includes('없습니다')) {
+                    validMatchCount++;
+                }
+            });
+            
+            // 최소 1개 이상의 유효한 경기 데이터가 있어야 함
+            if (validMatchCount > 0) {
                 setTimeout(loadAdSense, 1000); // 1초 후 로드하여 사용자 경험 개선
+            } else {
+                // 콘텐츠가 없으면 광고 제거
+                window.removeAdSense();
             }
         }
         
