@@ -931,10 +931,10 @@ function displayTopPlayers(allMatches) {
     topPlayersContainer.innerHTML = topPlayers.map((player, index) => `
         <div class="top-player-item">
             <div class="top-player-rank"></div>
-            <img src="/live/externalAssets/common/playersAction/p${player.spid}.png" 
+            <img src="https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p${player.spid || 'default'}.png" 
                  alt="${player.name}" 
                  class="top-player-image"
-                 onerror="this.onerror=null;">
+                 onerror="this.src='https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p100000000.png'">
             <div class="top-player-info">
                 <div class="top-player-name-section">
                     ${player.season?.seasonImg ? `<img src="${player.season.seasonImg}" alt="시즌" class="top-player-season-img" onerror="this.style.display='none'"/>` : ''}
