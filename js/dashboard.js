@@ -47,8 +47,8 @@
         const matchCountSelect = document.getElementById('matchCountSelect');
         if (matchCountSelect) {
             matchCountSelect.addEventListener('change', function() {
-                const selectedCount = parseInt(this.value);
-                loadMatchesWithCount(selectedCount);
+                const selectedOption = this.value; // '10' 또는 'max'
+                loadMatchesWithCount(selectedOption);
             });
         }
     } else {
@@ -1519,7 +1519,8 @@ async function loadMoreMatches() {
                 // 화면에 추가 경기 표시
                 displayMoreMatches(data.matches);
                 
-                // 대시보드 offset 증가
+                // 대시보드 데이터와 offset 갱신
+                dashboardMatches = dashboardMatches.concat(data.matches);
                 dashboardOffset += data.matches.length;
                 
                 // 대시보드 통계 갱신 (대시보드 전체 경기 기준으로 재계산)
