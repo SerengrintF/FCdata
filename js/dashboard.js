@@ -1677,6 +1677,12 @@ function showLoading(show) {
 function hideResults() {
     playerBasicInfo.style.display = 'none';
     tabContainer.style.display = 'none';
+    
+    // 환영 섹션 다시 표시
+    const welcomeSection = document.getElementById('welcomeSection');
+    if (welcomeSection) {
+        welcomeSection.style.display = 'block';
+    }
 }
 
 // 에러 표시/숨김
@@ -1686,9 +1692,10 @@ function showError(message) {
     playerBasicInfo.style.display = 'none';
     tabContainer.style.display = 'none';
     
-    // 에러 표시 시 광고 제거
-    if (typeof window.removeAdSense === 'function') {
-        window.removeAdSense();
+    // 에러 표시 시 광고 숨김
+    const adContainer = document.getElementById('dashboardAd');
+    if (adContainer) {
+        adContainer.style.display = 'none';
     }
 }
 
@@ -4437,6 +4444,12 @@ function resetToHomePage() {
     tabContainer.style.display = 'none';
     errorSection.style.display = 'none';
     
+    // 환영 섹션 다시 표시
+    const welcomeSection = document.getElementById('welcomeSection');
+    if (welcomeSection) {
+        welcomeSection.style.display = 'block';
+    }
+    
     // 검색 입력창 초기화
     nicknameInput.value = '';
     nicknameInput.focus();
@@ -4511,19 +4524,29 @@ async function loadWelcomeContent() {
             }
         } else {
             console.error('API Response not OK:', response.status);
-            // 에러 발생 시 기본값 표시
-            document.getElementById('totalVisitors').textContent = '-';
-            document.getElementById('totalSearches').textContent = '-';
-            document.getElementById('todayVisitors').textContent = '-';
-            document.getElementById('popularList').innerHTML = '<div class="loading-text">데이터를 불러올 수 없습니다</div>';
+            // 에러 발생 시 기본값 표시 (요소가 있는 경우에만)
+            const totalVisitors = document.getElementById('totalVisitors');
+            const totalSearches = document.getElementById('totalSearches');
+            const todayVisitors = document.getElementById('todayVisitors');
+            const popularList = document.getElementById('popularList');
+            
+            if (totalVisitors) totalVisitors.textContent = '-';
+            if (totalSearches) totalSearches.textContent = '-';
+            if (todayVisitors) todayVisitors.textContent = '-';
+            if (popularList) popularList.innerHTML = '<div class="loading-text">데이터를 불러올 수 없습니다</div>';
         }
     } catch (error) {
         console.log('Failed to load welcome content:', error);
-        // 에러 발생 시 기본값 표시
-        document.getElementById('totalVisitors').textContent = '-';
-        document.getElementById('totalSearches').textContent = '-';
-        document.getElementById('todayVisitors').textContent = '-';
-        document.getElementById('popularList').innerHTML = '<div class="loading-text">데이터를 불러올 수 없습니다</div>';
+        // 에러 발생 시 기본값 표시 (요소가 있는 경우에만)
+        const totalVisitors = document.getElementById('totalVisitors');
+        const totalSearches = document.getElementById('totalSearches');
+        const todayVisitors = document.getElementById('todayVisitors');
+        const popularList = document.getElementById('popularList');
+        
+        if (totalVisitors) totalVisitors.textContent = '-';
+        if (totalSearches) totalSearches.textContent = '-';
+        if (todayVisitors) todayVisitors.textContent = '-';
+        if (popularList) popularList.innerHTML = '<div class="loading-text">데이터를 불러올 수 없습니다</div>';
     }
 }
 

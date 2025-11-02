@@ -1001,6 +1001,12 @@ function setGradeDisplay(gradeType, gradeValue) {
 
 // 대시보드 표시
 function showDashboard(userInfo) {
+    // 환영 섹션 숨기기
+    const welcomeSection = document.getElementById('welcomeSection');
+    if (welcomeSection) {
+        welcomeSection.style.display = 'none';
+    }
+    
     tabContainer.style.display = 'block';
     
     // 기본적으로 대시보드 탭 활성화
