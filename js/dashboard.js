@@ -1683,6 +1683,12 @@ function hideResults() {
     if (welcomeSection) {
         welcomeSection.style.display = 'block';
     }
+    
+    // 광고 숨김
+    const adContainer = document.getElementById('dashboardAd');
+    if (adContainer) {
+        adContainer.style.display = 'none';
+    }
 }
 
 // 에러 표시/숨김
@@ -4476,6 +4482,11 @@ function resetToHomePage() {
     loading.style.display = 'none';
     searchBtn.disabled = false;
     
+    // 광고 숨김
+    const adContainer = document.getElementById('dashboardAd');
+    if (adContainer) {
+        adContainer.style.display = 'none';
+    }
 }
 
 // 환영 섹션 데이터 로드 함수
@@ -4490,63 +4501,24 @@ async function loadWelcomeContent() {
             const data = await response.json();
             console.log('API Data:', data);
             
-            // 사이트 통계 표시
-            if (data.summary) {
-                const totalVisitors = document.getElementById('totalVisitors');
-                const totalSearches = document.getElementById('totalSearches');
-                const todayVisitors = document.getElementById('todayVisitors');
-                
-                if (totalVisitors) {
-                    const num = data.summary.totalVisitors || 0;
-                    totalVisitors.textContent = formatNumber(num);
-                }
-                if (totalSearches) {
-                    const num = data.summary.totalSearches || 0;
-                    totalSearches.textContent = formatNumber(num);
-                }
-                if (todayVisitors) {
-                    const num = data.summary.todayVisitors || 0;
-                    todayVisitors.textContent = formatNumber(num);
-                }
-            }
-            
-            // 인기 검색어 표시
+            // 인기 검색어 표시 (API 데이터가 있으면 업데이트, 없으면 초기 HTML 데이터 유지)
             const popularList = document.getElementById('popularList');
             if (popularList && data.topSearches && data.topSearches.length > 0) {
+                // API에서 받은 실제 데이터로 업데이트
                 popularList.innerHTML = data.topSearches
                     .slice(0, 10) // 최대 10개
                     .map(item => 
                         `<div class="popular-item" onclick="searchNickname('${item.nickname}')">${item.nickname}</div>`
                     ).join('');
-            } else if (popularList) {
-                // 데이터가 없으면 메시지 표시
-                popularList.innerHTML = '<div class="loading-text">아직 검색 데이터가 없습니다</div>';
             }
+            // API 데이터가 없으면 초기 HTML에 있는 기본 데이터를 그대로 유지 (Google 봇이 인식할 수 있도록)
         } else {
             console.error('API Response not OK:', response.status);
-            // 에러 발생 시 기본값 표시 (요소가 있는 경우에만)
-            const totalVisitors = document.getElementById('totalVisitors');
-            const totalSearches = document.getElementById('totalSearches');
-            const todayVisitors = document.getElementById('todayVisitors');
-            const popularList = document.getElementById('popularList');
-            
-            if (totalVisitors) totalVisitors.textContent = '-';
-            if (totalSearches) totalSearches.textContent = '-';
-            if (todayVisitors) todayVisitors.textContent = '-';
-            if (popularList) popularList.innerHTML = '<div class="loading-text">데이터를 불러올 수 없습니다</div>';
+            // 에러 발생 시 인기 검색어는 초기 HTML 데이터를 그대로 유지 (Google 봇이 인식할 수 있도록)
         }
     } catch (error) {
         console.log('Failed to load welcome content:', error);
-        // 에러 발생 시 기본값 표시 (요소가 있는 경우에만)
-        const totalVisitors = document.getElementById('totalVisitors');
-        const totalSearches = document.getElementById('totalSearches');
-        const todayVisitors = document.getElementById('todayVisitors');
-        const popularList = document.getElementById('popularList');
-        
-        if (totalVisitors) totalVisitors.textContent = '-';
-        if (totalSearches) totalSearches.textContent = '-';
-        if (todayVisitors) todayVisitors.textContent = '-';
-        if (popularList) popularList.innerHTML = '<div class="loading-text">데이터를 불러올 수 없습니다</div>';
+        // 에러 발생 시 인기 검색어는 초기 HTML 데이터를 그대로 유지 (Google 봇이 인식할 수 있도록)
     }
 }
 

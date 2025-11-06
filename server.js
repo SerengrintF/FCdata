@@ -59,7 +59,12 @@ const server = http.createServer((req, res) => {
 
     // 파일 확장자 확인
     const extname = String(path.extname(filePath)).toLowerCase();
-    const mimeType = mimeTypes[extname] || 'application/octet-stream';
+    let mimeType = mimeTypes[extname] || 'application/octet-stream';
+    
+    // RSS 피드 파일에 대한 특별 처리
+    if (req.url === '/feed.xml' || filePath.endsWith('feed.xml')) {
+        mimeType = 'application/rss+xml';
+    }
 
     // 파일 읽기
     fs.readFile(filePath, (error, content) => {

@@ -272,6 +272,21 @@ document.addEventListener('DOMContentLoaded', function() {
             closeEmailPopup();
         }
     });
+    
+    // URL 파라미터에서 검색어 확인 및 자동 검색
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchTerm = urlParams.get('search');
+    if (searchTerm && searchTerm.trim()) {
+        // 약간의 지연을 두어 다른 초기화가 완료된 후 검색 실행
+        setTimeout(() => {
+            if (nicknameInput) {
+                nicknameInput.value = decodeURIComponent(searchTerm.trim());
+                searchUser();
+                // 검색 후 URL에서 ?search= 파라미터 제거 (히스토리 유지)
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        }, 100);
+    }
 });
 
 // 경기 통계 업데이트 (더보기로 경기 추가 시 호출)
@@ -2151,5 +2166,61 @@ function checkMidRangeGoals(matches) {
     return matches.reduce((sum, match) => {
         return sum + (match.userStats?.shoot?.goalOutPenalty || 0);
     }, 0);
+}
+
+// 패치노트 로드 및 렌더링
+async function loadPatchNotes() {
+    try {
+        const response = await fetch('/data/patch-notes.json');
+        if (!response.ok) {
+            throw new Error('패치노트를 불러올 수 없습니다.');
+        }
+        const data = await response.json();
+        renderPatchNotes(data.patchNotes);
+    } catch (error) {
+        console.error('패치노트 로드 실패:', error);
+        // 에러 발생 시 기본 메시지 표시
+        const noticeList = document.querySelector('.notice-list');
+        if (noticeList) {
+            noticeList.innerHTML = '<div class="notice-item"><div class="notice-content"><p>패치노트를 불러올 수 없습니다.</p></div></div>';
+        }
+    }
+}
+
+// 패치노트 렌더링
+function renderPatchNotes(patchNotes) {
+    const noticeList = document.querySelector('.notice-list');
+    if (!noticeList) return;
+    
+    // 최신순으로 정렬 (날짜 기준 내림차순)
+    const sortedNotes = [...patchNotes].sort((a, b) => {
+        return b.date.localeCompare(a.date);
+    });
+    
+    // 기존 초기 HTML 콘텐츠를 유지하면서 JSON 데이터로 업데이트
+    // (애드센스 봇이 초기 HTML을 크롤링할 수 있도록)
+    noticeList.innerHTML = sortedNotes.map(note => {
+        const newBadge = note.isNew ? '<span class="notice-badge new">NEW</span>' : '';
+        return `
+            <div class="notice-item" onclick="toggleNoticeItem(this)">
+                <div class="notice-header">
+                    <span class="notice-date">${note.date}</span>
+                    <span class="notice-title">${note.title}</span>
+                    ${newBadge}
+                    <span class="notice-toggle-icon">▼</span>
+                </div>
+                <div class="notice-content">
+                    <p>${note.content}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// 페이지 로드 시 패치노트 로드
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadPatchNotes);
+} else {
+    loadPatchNotes();
 }
 

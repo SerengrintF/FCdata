@@ -184,58 +184,128 @@
                     </div>
                 </div>
                 
-                <div class="usage-guide">
-                    <h3>사용 방법</h3>
-                    <div class="guide-steps">
-                        <div class="guide-step">
-                            <span class="step-number">1</span>
-                            <span class="step-text">위 검색창에 FC온라인 닉네임을 입력하세요</span>
+                <!-- 패치노트 섹션 -->
+                <div class="notice-section">
+                    <h3>📝 패치노트</h3>
+                    <div class="notice-list">
+                        <!-- 초기 HTML 데이터 (Google 봇이 인식할 수 있도록) -->
+                        <div class="notice-item" onclick="toggleNoticeItem(this)">
+                            <div class="notice-header">
+                                <span class="notice-date">2025.10.24</span>
+                                <span class="notice-title">모바일 UX 개선 업데이트</span>
+                                <span class="notice-badge new">NEW</span>
+                                <span class="notice-toggle-icon">▼</span>
+                            </div>
+                            <div class="notice-content">
+                                <p>모바일과 태블릿 환경에서의 사용자 경험이 대폭 개선되었습니다. 하단 고정 탭바로 쉬운 네비게이션, 모바일 최적화된 검색 팝업, 터치 친화적인 인터페이스, 반응형 레이아웃 등이 적용되어 스마트폰에서도 편리하게 FC Data를 이용할 수 있습니다.</p>
+                            </div>
                         </div>
-                        <div class="guide-step">
-                            <span class="step-number">2</span>
-                            <span class="step-text">경기 유형을 선택하세요 (공식경기/감독모드/친선경기)</span>
+                        <div class="notice-item" onclick="toggleNoticeItem(this)">
+                            <div class="notice-header">
+                                <span class="notice-date">2025.10.17</span>
+                                <span class="notice-title">공식/친선 경기 업데이트</span>
+                                <span class="notice-toggle-icon">▼</span>
+                            </div>
+                            <div class="notice-content">
+                                <p>경기 타입 선택 기능이 개선되었습니다. 공식경기(랭크매치), 친선경기, 감독모드 등 원하는 경기 유형을 선택하여 검색할 수 있으며, 각 매치 타입별로 정확한 통계와 분석 데이터를 제공합니다. 더욱 세밀한 전적 분석이 가능해졌습니다.</p>
+                            </div>
                         </div>
-                        <div class="guide-step">
-                            <span class="step-number">3</span>
-                            <span class="step-text">검색 버튼을 클릭하여 데이터를 확인하세요</span>
-                        </div>
+                        <!-- 추가 패치노트는 JavaScript로 동적으로 로드됩니다 -->
                     </div>
                 </div>
 
                 <!-- FC Data 소개 섹션 -->
                 <div class="about-section">
                     <h3>FC Data란?</h3>
-                    <p>FC Data는 FC온라인 유저들을 위한 무료 전적 분석 도구입니다. 
-                    넥슨 공식 Open API를 활용하여 실시간 경기 데이터를 제공하며, 
-                    로그인 없이 닉네임만으로 간편하게 검색할 수 있습니다.</p>
+                    <p>FC Data는 FC온라인(피파온라인) 유저들을 위한 전문 전적 분석 플랫폼입니다. 
+                    넥슨 공식 Open API를 활용하여 제공되는 <strong>실시간 경기 데이터</strong>를 기반으로 
+                    체계적인 전적 분석과 성과 평가를 무료로 제공합니다. 
+                    복잡한 로그인 절차 없이 <strong>닉네임만으로 즉시 검색</strong>이 가능하여, 
+                    누구나 쉽게 자신의 게임 성과를 분석하고 개선점을 발견할 수 있습니다.</p>
                     
-                    <h3>주요 기능</h3>
-                    <p><strong>최근 100경기 상세 분석</strong><br>
-                    FC온라인에서 플레이한 최근 100경기의 상세한 데이터를 확인할 수 있습니다. 
-                    승률, 평균 득점, 평균 실점, 경기력 트렌드, 패드/키보드 대전 승률 등 
-                    다양한 통계를 한눈에 확인하실 수 있습니다. 각 경기별로 득점 유형, 
-                    주요 선수 활약도, 경기 하이라이트 등 상세 정보도 제공됩니다.</p>
+                    <h3>핵심 기능 및 활용 방법</h3>
                     
-                    <p><strong>구단별 성과 통계</strong><br>
-                    동일한 선수들로 구성된 구단(7명 이상 동일한 선수)의 성과를 분석합니다. 
-                    최근 30일 및 100경기 기준으로 구단별 승률, 평균 득실점, 최고의 선수, 
-                    선수별 상세 통계를 제공하여 어떤 구단 조합이 가장 효과적인지 확인할 수 있습니다.</p>
+                    <div class="feature-list">
+                        <div class="feature-item" onclick="toggleFeatureItem(this)">
+                            <div class="feature-header">
+                                <span class="feature-icon">📊</span>
+                                <span class="feature-title">최근 100경기 상세 분석</span>
+                                <span class="feature-toggle-icon">▼</span>
+                            </div>
+                            <div class="feature-content">
+                                <p>FC온라인에서 플레이한 <strong>최근 100경기의 종합 통계</strong>를 한눈에 확인할 수 있습니다. 
+                                승률, 평균 득점, 평균 실점, 경기력 트렌드 분석 등 핵심 지표를 제공하며, 
+                                특히 <strong>패드/키보드 대전 승률</strong>을 별도로 분석하여 
+                                자신의 플레이 스타일에 맞는 최적의 입력 장치를 파악할 수 있습니다. 
+                                각 경기별로는 득점 유형(근거리/중거리/헤딩), 주요 선수 기여도, 
+                                경기 시간대별 득실점 패턴 등 <strong>상세한 경기 데이터</strong>를 제공합니다. 
+                                이를 통해 단순한 승패 기록을 넘어선 심층적인 경기 분석이 가능합니다.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item" onclick="toggleFeatureItem(this)">
+                            <div class="feature-header">
+                                <span class="feature-icon">⚽</span>
+                                <span class="feature-title">구단별 성과 통계 분석</span>
+                                <span class="feature-toggle-icon">▼</span>
+                            </div>
+                            <div class="feature-content">
+                                <p>동일한 선수들로 구성된 구단(7명 이상 동일한 선수)의 성과를 
+                                <strong>최근 30일 및 100경기 기준</strong>으로 분석합니다. 
+                                구단별 승률, 평균 득실점, 최고 기여 선수, 선수별 상세 통계를 제공하여 
+                                <strong>어떤 구단 조합이 가장 효과적인지</strong> 데이터 기반으로 확인할 수 있습니다. 
+                                이를 통해 자신의 플레이 스타일에 최적화된 선수 조합을 찾고, 
+                                구단별 강점과 약점을 파악하여 전략을 수립할 수 있습니다.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item" onclick="toggleFeatureItem(this)">
+                            <div class="feature-header">
+                                <span class="feature-icon">📈</span>
+                                <span class="feature-title">포메이션 분석 및 최적화</span>
+                                <span class="feature-toggle-icon">▼</span>
+                            </div>
+                            <div class="feature-content">
+                                <p>사용한 포메이션별로 경기 성과를 <strong>비교 분석</strong>할 수 있는 기능입니다. 
+                                각 포메이션의 전체 성과뿐만 아니라, 동일 포메이션을 사용한 경기 그룹의 
+                                상세 데이터를 제공하여 <strong>자신에게 가장 적합한 포메이션을 찾을 수 있습니다</strong>. 
+                                예를 들어, 4-3-3 포메이션에서의 승률이 70%이고, 4-4-2에서는 50%라면 
+                                공격적 플레이 스타일에 더 적합한 포메이션을 선택할 수 있습니다.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item" onclick="toggleFeatureItem(this)">
+                            <div class="feature-header">
+                                <span class="feature-icon">⚔️</span>
+                                <span class="feature-title">라이벌 매치 분석</span>
+                                <span class="feature-toggle-icon">▼</span>
+                            </div>
+                            <div class="feature-content">
+                                <p>특정 상대와의 전적을 <strong>체계적으로 분석</strong>하여 전략을 수립하는 데 도움을 드립니다. 
+                                상대방 닉네임을 입력하면 해당 상대와의 모든 경기 기록을 확인할 수 있으며, 
+                                승패 패턴, 득실점 차이, 주로 사용한 포메이션 등을 분석하여 
+                                <strong>다음 경기를 위한 맞춤형 전략</strong>을 수립할 수 있습니다.</p>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <p><strong>포메이션 분석</strong><br>
-                    사용한 포메이션별로 경기 성과를 비교 분석할 수 있습니다. 각 포메이션의 
-                    전체 성과와 동일 포메이션을 사용한 경기 그룹의 상세 데이터를 통해 
-                    자신에게 가장 적합한 포메이션을 찾을 수 있습니다.</p>
+                    <h3>데이터 기반 전략 수립 가이드</h3>
+                    <p>FC Data는 단순한 전적 기록을 넘어선 <strong>종합적인 경기 분석 도구</strong>입니다. 
+                    경기별 득점, 실점, 점유율, 슈팅 성공률, 패스 성공률 등 다양한 스탯을 제공하며, 
+                    <strong>시간대별 득실점 분석</strong>을 통해 자신의 집중력이 높은 시간대를 파악할 수 있습니다. 
+                    골 유형 분석(근거리/중거리/헤딩)을 통해 자신의 주요 득점 패턴을 이해하고, 
+                    주요 선수 기여도 분석을 통해 <strong>팀의 핵심 선수</strong>를 파악할 수 있습니다.</p>
                     
-                    <p><strong>라이벌 매치 분석</strong><br>
-                    특정 상대와의 전적을 분석하여 전략을 수립하는 데 도움을 드립니다. 
-                    상대방 닉네임을 입력하면 해당 상대와의 모든 경기 기록을 확인할 수 있습니다.</p>
+                    <p>구단별로 어떤 선수 조합이 가장 효과적인지, 어떤 포메이션이 승률이 높은지 
+                    <strong>객관적인 데이터를 기반으로 확인</strong>할 수 있어, 
+                    감에 의존하지 않고 <strong>과학적인 접근으로 게임 실력을 향상</strong>시킬 수 있습니다. 
+                    또한 패드와 키보드 대전 승률을 비교하여 자신에게 더 유리한 환경을 선택할 수 있으며, 
+                    경기력 트렌드 분석을 통해 최근 플레이 상태를 모니터링할 수 있습니다.</p>
                     
-                    <h3>데이터 분석 가이드</h3>
-                    <p>FC Data는 경기별 득점, 실점, 점유율, 슈팅 성공률 등 다양한 스탯을 제공합니다. 
-                    시간대별 득실점 분석, 골 유형 분석(근거리/중거리/헤딩), 주요 선수 기여도 등 
-                    심화된 데이터를 통해 여러분의 플레이 스타일을 객관적으로 파악할 수 있습니다. 
-                    구단별로 어떤 선수 조합이 효과적인지, 어떤 포메이션이 승률이 높은지 
-                    데이터 기반으로 확인하실 수 있습니다.</p>
+                    <p>FC Data는 FC온라인 유저들이 <strong>더 나은 성과를 달성</strong>할 수 있도록 
+                    데이터 기반의 인사이트를 제공하는 전문 분석 플랫폼입니다. 
+                    무료로 제공되는 모든 기능을 활용하여 자신만의 게임 전략을 수립하고, 
+                    지속적인 개선을 통해 실력을 향상시켜보세요.</p>
                 </div>
 
                 <!-- FAQ 섹션 -->
@@ -254,8 +324,6 @@
                     <div class="faq-item">
                         <h4>Q: 데이터는 언제 업데이트되나요?</h4>
                         <p>A: 넥슨 공식 API를 통해 경기가 끝나고, 약 2시간 후의 데이터를 볼 수 있습니다.</p>
-
-                   
                     </div>
                 </div>
 
@@ -263,7 +331,12 @@
                 <div class="popular-searches-section">
                     <h3>🔥 인기 검색</h3>
                     <div class="popular-list" id="popularList">
-                        <div class="loading-text">로딩 중...</div>
+                        <!-- 초기 HTML 데이터 (Google 봇이 인식할 수 있도록) -->
+                        <div class="popular-item" onclick="searchNickname('예시닉네임1')">예시닉네임1</div>
+                        <div class="popular-item" onclick="searchNickname('예시닉네임2')">예시닉네임2</div>
+                        <div class="popular-item" onclick="searchNickname('예시닉네임3')">예시닉네임3</div>
+                        <div class="popular-item" onclick="searchNickname('예시닉네임4')">예시닉네임4</div>
+                        <div class="popular-item" onclick="searchNickname('예시닉네임5')">예시닉네임5</div>
                     </div>
                 </div>
             </div>
@@ -840,41 +913,66 @@
     
     <!-- 애드센스 표시 제어 스크립트 -->
     <script>
-        // 광고 표시/숨김 함수
+        // 페이지 로드 시 즉시 광고 숨김 보장
+        document.addEventListener('DOMContentLoaded', function() {
+            const adContainer = document.getElementById('dashboardAd');
+            if (adContainer) {
+                adContainer.style.display = 'none';
+            }
+        });
+        
+        // 광고 표시/숨김 함수 (Google AdSense 정책 준수)
         function showAdSenseAd() {
             const adContainer = document.getElementById('dashboardAd');
             const matchesList = document.getElementById('matchesList');
             const errorSection = document.getElementById('errorSection');
             const playerInfo = document.getElementById('playerBasicInfo');
+            const welcomeSection = document.getElementById('welcomeSection');
+            const tabContainer = document.getElementById('tabContainer');
             
             if (!adContainer) return;
             
-            // 에러가 있으면 광고 숨김
+            // 1. 환영 섹션이 표시되어 있으면 광고 숨김 (초기 화면)
+            if (welcomeSection && welcomeSection.style.display !== 'none') {
+                adContainer.style.display = 'none';
+                return;
+            }
+            
+            // 2. 에러가 있으면 광고 숨김
             if (errorSection && errorSection.style.display !== 'none') {
                 adContainer.style.display = 'none';
                 return;
             }
             
-            // 플레이어 정보가 없으면 광고 숨김
+            // 3. 플레이어 정보가 없으면 광고 숨김
             if (!playerInfo || playerInfo.style.display === 'none') {
                 adContainer.style.display = 'none';
                 return;
             }
             
-            // 경기 데이터 확인
+            // 4. 탭 컨테이너가 표시되지 않으면 광고 숨김
+            if (!tabContainer || tabContainer.style.display === 'none') {
+                adContainer.style.display = 'none';
+                return;
+            }
+            
+            // 5. 경기 데이터 확인 - 최소 5개 이상의 유효한 경기가 있어야 함
             if (matchesList) {
                 const matchItems = matchesList.querySelectorAll('.match-item');
-                let hasValidMatches = false;
+                let validMatchCount = 0;
                 
                 matchItems.forEach(item => {
+                    // 유효한 경기 아이템인지 확인
                     if (!item.classList.contains('no-matches') && 
-                        !item.textContent.includes('경기 기록이 없습니다')) {
-                        hasValidMatches = true;
+                        !item.textContent.includes('경기 기록이 없습니다') &&
+                        !item.textContent.includes('데이터를 불러오는 중') &&
+                        item.querySelector('.match-header')) {
+                        validMatchCount++;
                     }
                 });
                 
-                // 유효한 경기 데이터가 있으면 광고 표시 및 초기화
-                if (hasValidMatches) {
+                // 최소 5개 이상의 유효한 경기 데이터가 있을 때만 광고 표시
+                if (validMatchCount >= 5) {
                     adContainer.style.display = 'block';
                     
                     // 광고 초기화 (처음 한 번만)
@@ -887,19 +985,37 @@
                         console.log('AdSense 초기화:', e);
                     }
                 } else {
+                    // 충분한 콘텐츠가 없으면 광고 숨김
                     adContainer.style.display = 'none';
                 }
+            } else {
+                adContainer.style.display = 'none';
             }
         }
         
-        // 데이터 로드 완료 시 광고 표시
+        // 데이터 로드 완료 시 광고 표시 (지연 시간 증가)
         function onDataLoaded() {
-            setTimeout(showAdSenseAd, 500);
+            // 데이터가 완전히 렌더링된 후 광고 표시
+            setTimeout(showAdSenseAd, 1500);
         }
         
         // 전역 함수로 등록
         window.showAdSenseAd = showAdSenseAd;
         window.onDataLoaded = onDataLoaded;
+        
+        // 패치노트 아이템 토글 함수
+        function toggleNoticeItem(element) {
+            element.classList.toggle('expanded');
+        }
+        
+        // 기능 설명 아이템 토글 함수
+        function toggleFeatureItem(element) {
+            element.classList.toggle('expanded');
+        }
+        
+        // 전역 함수로 등록
+        window.toggleNoticeItem = toggleNoticeItem;
+        window.toggleFeatureItem = toggleFeatureItem;
     </script>
     
     <!-- 요즘 나의 경기는? 팝업 -->

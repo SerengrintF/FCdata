@@ -3727,3 +3727,212 @@
 		font-size: 15px;
 	}
 }
+
+/* 핵심 기능 섹션 모바일 개선 (데스크탑 레이아웃 변경 없음) */
+@media (max-width: 1024px) {
+	/* feature-list 컨테이너 */
+	.feature-list {
+		gap: var(--m-gap-md);
+		margin-bottom: 1.5rem;
+	}
+	
+	/* feature-item 카드 개선 */
+	.feature-item {
+		min-height: 56px; /* 최소 터치 타겟 크기 */
+		border-radius: 12px;
+	}
+	
+	/* feature-header 개선 */
+	.feature-item .feature-header {
+		padding: 14px 16px; /* 충분한 패딩 */
+		min-height: 56px; /* 터치 타겟 크기 확보 */
+		gap: 12px;
+		align-items: center;
+	}
+	
+	/* 아이콘 크기 조정 */
+	.feature-item .feature-icon {
+		font-size: 1.3rem;
+		flex-shrink: 0;
+		width: 32px;
+		text-align: center;
+	}
+	
+	/* 제목 스타일 개선 */
+	.feature-item .feature-title {
+		font-size: 15px;
+		font-weight: 600;
+		line-height: 1.4;
+		flex: 1;
+		min-width: 0; /* 텍스트 잘림 방지 */
+		word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
+		overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
+	}
+	
+	/* 토글 아이콘 크기 조정 */
+	.feature-item .feature-toggle-icon {
+		font-size: 10px;
+		flex-shrink: 0;
+		width: 20px;
+		text-align: center;
+	}
+	
+	/* 콘텐츠 영역 초기 상태 (접혀있을 때) */
+	.feature-item .feature-content {
+		max-height: 0 !important;
+		overflow: hidden !important;
+		padding: 0 16px !important;
+		transition: max-height var(--transition-normal), padding var(--transition-normal);
+	}
+	
+	/* 확장된 콘텐츠 영역 개선 */
+	.feature-item.expanded .feature-content {
+		max-height: 1000px !important;
+		padding: 16px !important;
+	}
+	
+	/* 콘텐츠 텍스트 개선 */
+	.feature-item .feature-content p {
+		font-size: 14px;
+		line-height: 1.7;
+		text-align: left;
+		word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
+		overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
+		margin: 0;
+	}
+	
+	/* strong 태그 스타일 */
+	.feature-item .feature-content strong {
+		font-weight: 600;
+		color: var(--text-primary);
+	}
+	
+	/* hover 효과 제거 (모바일에서는 불필요) */
+	.feature-item:hover {
+		border-color: var(--border-color);
+		box-shadow: none;
+	}
+	
+	.feature-item:hover .feature-header {
+		background: transparent;
+	}
+	
+	/* 확장된 상태에서만 배경색 변경 */
+	.feature-item.expanded .feature-header {
+		background: var(--bg-tertiary);
+	}
+}
+
+/* 작은 화면 (480px 이하) 추가 최적화 */
+@media (max-width: 480px) {
+	.feature-item .feature-header {
+		padding: 12px;
+		min-height: 52px;
+		gap: 10px;
+	}
+	
+	.feature-item .feature-icon {
+		font-size: 1.2rem;
+		width: 28px;
+	}
+	
+	.feature-item .feature-title {
+		font-size: 14px;
+	}
+	
+	.feature-item .feature-content {
+		padding: 0 14px !important;
+	}
+	
+	.feature-item.expanded .feature-content {
+		padding: 14px !important;
+	}
+	
+	.feature-item .feature-content p {
+		font-size: 13px;
+		line-height: 1.6;
+	}
+}
+
+/* 패치노트 섹션 모바일 개선 (데스크탑 레이아웃 변경 없음) */
+@media (max-width: 1024px) {
+	/* notice-list 컨테이너 */
+	.notice-list {
+		gap: var(--m-gap-md);
+	}
+	
+	/* notice-item 카드 개선 */
+	.notice-item {
+		min-height: 56px; /* 최소 터치 타겟 크기 */
+		border-radius: 12px;
+	}
+	
+	/* notice-header 개선 */
+	.notice-item .notice-header {
+		padding: 14px 16px; /* 충분한 패딩 */
+		min-height: 56px; /* 터치 타겟 크기 확보 */
+		gap: 12px;
+		align-items: center;
+	}
+	
+	/* 콘텐츠 영역 초기 상태 (접혀있을 때) */
+	.notice-item .notice-content {
+		max-height: 0 !important;
+		overflow: hidden !important;
+		padding: 0 16px !important;
+		transition: max-height var(--transition-normal), padding var(--transition-normal);
+	}
+	
+	/* 확장된 콘텐츠 영역 개선 */
+	.notice-item.expanded .notice-content {
+		max-height: 500px !important;
+		padding: 16px !important;
+	}
+	
+	/* 콘텐츠 텍스트 개선 */
+	.notice-item .notice-content p {
+		font-size: 14px;
+		line-height: 1.7;
+		text-align: left;
+		word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
+		overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
+		margin: 0;
+	}
+	
+	/* hover 효과 제거 (모바일에서는 불필요) */
+	.notice-item:hover {
+		border-color: var(--border-color);
+		box-shadow: none;
+	}
+	
+	.notice-item:hover .notice-header {
+		background: transparent;
+	}
+	
+	/* 확장된 상태에서만 배경색 변경 */
+	.notice-item.expanded .notice-header {
+		background: var(--bg-tertiary);
+	}
+}
+
+/* 작은 화면 (480px 이하) 패치노트 추가 최적화 */
+@media (max-width: 480px) {
+	.notice-item .notice-header {
+		padding: 12px;
+		min-height: 52px;
+		gap: 10px;
+	}
+	
+	.notice-item .notice-content {
+		padding: 0 14px !important;
+	}
+	
+	.notice-item.expanded .notice-content {
+		padding: 14px !important;
+	}
+	
+	.notice-item .notice-content p {
+		font-size: 13px;
+		line-height: 1.6;
+	}
+}
