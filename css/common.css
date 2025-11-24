@@ -2498,26 +2498,211 @@ body.modal-open {
     margin: 0;
 }
 
+/* 사용 가이드 섹션 스타일 */
+.guide-section {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.guide-section h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+}
+
+.guide-article {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all var(--transition-normal);
+}
+
+.guide-article:last-child {
+    margin-bottom: 0;
+}
+
+.guide-article:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-sm);
+}
+
+.guide-article h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-accent);
+    margin: 0 0 1rem 0;
+}
+
+.guide-article h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 1.5rem 0 0.75rem 0;
+}
+
+.guide-article h5:first-of-type {
+    margin-top: 1rem;
+}
+
+.guide-article p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0 0 1rem 0;
+    text-align: justify;
+}
+
+.guide-article p:last-child {
+    margin-bottom: 0;
+}
+
+/* 실력 향상 팁 섹션 스타일 */
+.tips-section {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.tips-section h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+}
+
+.tip-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all var(--transition-normal);
+}
+
+.tip-card:last-child {
+    margin-bottom: 0;
+}
+
+.tip-card:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+}
+
+.tip-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-accent);
+    margin: 0 0 0.75rem 0;
+}
+
+.tip-card p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    text-align: justify;
+}
+
+/* 활용 사례 섹션 스타일 */
+.use-cases-section {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.use-cases-section h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+}
+
+.use-case-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all var(--transition-normal);
+}
+
+.use-case-item:last-child {
+    margin-bottom: 0;
+}
+
+.use-case-item:hover {
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-sm);
+}
+
+.use-case-item h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-accent);
+    margin: 0 0 0.75rem 0;
+}
+
+.use-case-item p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    text-align: justify;
+}
+
 /* 모바일 대응 */
 @media (max-width: 768px) {
     .about-section,
-    .info-section {
+    .info-section,
+    .guide-section,
+    .tips-section,
+    .use-cases-section {
         padding: 1.5rem;
     }
     
     .about-section h3,
-    .info-section h3 {
+    .info-section h3,
+    .guide-section h3,
+    .tips-section h3,
+    .use-cases-section h3 {
         font-size: 1.2rem;
     }
     
     .about-section p,
-    .faq-item p {
+    .faq-item p,
+    .guide-article p,
+    .tip-card p,
+    .use-case-item p {
         font-size: 0.9rem;
         text-align: left;
     }
     
-    .faq-item {
+    .faq-item,
+    .guide-article,
+    .tip-card,
+    .use-case-item {
         padding: 1rem;
+    }
+    
+    .guide-article h4,
+    .tip-card h4,
+    .use-case-item h4 {
+        font-size: 0.95rem;
+    }
+    
+    .guide-article h5 {
+        font-size: 0.9rem;
     }
     
     .feature-item .feature-header {
@@ -2854,6 +3039,31 @@ body.modal-open {
     color: var(--text-secondary);
     font-size: 0.9rem;
     padding: 1rem;
+}
+
+/* Footer 링크 스타일 */
+footer a {
+    transition: color var(--transition-fast);
+}
+
+footer a:hover {
+    color: var(--text-accent);
+}
+
+@media (max-width: 768px) {
+    footer {
+        padding: 1.5rem 1rem !important;
+    }
+    
+    footer div {
+        flex-direction: column;
+        gap: 0.75rem !important;
+    }
+    
+    footer a {
+        display: block;
+        padding: 0.25rem 0;
+    }
 }
 
 /* 대시보드 스타일 - 현대적 그리드 */
