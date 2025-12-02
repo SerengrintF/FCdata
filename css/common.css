@@ -3041,6 +3041,80 @@ body.modal-open {
     padding: 1rem;
 }
 
+/* 쿠팡 파트너스 배너 스타일 */
+.coupang-banner-container {
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    padding: 0 2rem;
+}
+
+.coupang-banner {
+    width: 680px;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 140px;
+}
+
+.coupang-disclosure {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .coupang-banner-container {
+        margin: 1rem auto;
+        padding: 0 0.75rem;
+    }
+    
+    .coupang-banner {
+        width: 100%;
+        max-width: 100%;
+        padding: 0.5rem;
+        min-height: auto;
+        overflow: hidden;
+        border-radius: var(--radius-sm);
+    }
+    
+    .coupang-banner iframe,
+    .coupang-banner div {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    
+    .coupang-disclosure {
+        font-size: 0.65rem;
+        padding: 0 0.5rem;
+        margin-top: 0.5rem;
+        line-height: 1.5;
+    }
+}
+
+@media (max-width: 480px) {
+    .coupang-banner-container {
+        margin: 0.75rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .coupang-banner {
+        padding: 0.25rem;
+    }
+    
+    .coupang-disclosure {
+        font-size: 0.6rem;
+        padding: 0 0.25rem;
+    }
+}
+
 /* Footer 링크 스타일 */
 footer a {
     transition: color var(--transition-fast);

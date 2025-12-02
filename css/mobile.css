@@ -3936,3 +3936,52 @@
 		line-height: 1.6;
 	}
 }
+
+/* 쿠팡 파트너스 배너 모바일 최적화 */
+@media (max-width: 1024px) {
+	.coupang-banner-container {
+		margin: 1rem auto;
+		padding: 0 0.75rem;
+	}
+	
+	.coupang-banner {
+		width: 100%;
+		max-width: 100%;
+		padding: 0.5rem;
+		min-height: auto;
+		overflow: hidden;
+		border-radius: var(--radius-sm);
+	}
+	
+	/* 쿠팡 배너 내부 요소 반응형 처리 */
+	.coupang-banner iframe,
+	.coupang-banner div,
+	.coupang-banner script + div {
+		max-width: 100% !important;
+		width: 100% !important;
+		overflow-x: auto;
+	}
+	
+	.coupang-disclosure {
+		font-size: 0.65rem;
+		padding: 0 0.5rem;
+		margin-top: 0.5rem;
+		line-height: 1.5;
+	}
+}
+
+@media (max-width: 480px) {
+	.coupang-banner-container {
+		margin: 0.75rem auto;
+		padding: 0 0.5rem;
+	}
+	
+	.coupang-banner {
+		padding: 0.25rem;
+	}
+	
+	.coupang-disclosure {
+		font-size: 0.6rem;
+		padding: 0 0.25rem;
+	}
+}

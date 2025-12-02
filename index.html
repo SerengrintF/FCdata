@@ -138,6 +138,17 @@
             <button id="searchBtn">검색</button>
         </div>
 
+        <!-- 쿠팡 파트너스 배너 -->
+        <div class="coupang-banner-container">
+            <div class="coupang-banner" id="coupangBanner">
+                <script src="https://ads-partners.coupang.com/g.js"></script>
+                <script>
+                    new PartnersCoupang.G({"id":947462,"template":"carousel","trackingCode":"AF6808628","width":"680","height":"140","tsource":""});
+                </script>
+            </div>
+            <p class="coupang-disclosure">본 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+        </div>
+
         <!-- 검색 중 상태 알림 -->
         <div class="loading" id="loading" style="display: none;">
             <div class="spinner"></div>
@@ -1119,6 +1130,7 @@
         <p>Data based on NEXON Open API</p>
         <p style="margin-top: 0.5rem; font-size: 0.8rem;">FC Data is not associated with NEXON Korea.</p>
     </footer>
+    </div>
 
     <!-- 모바일 검색 팝업 -->
     <div class="mobile-search-popup-overlay" id="mobileSearchPopup" style="display: none;">
