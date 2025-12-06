@@ -2,22 +2,24 @@
 
 /* Pull-to-refresh 방지 설정 */
 @media (max-width: 1024px) {
-	html, body {
+
+	html,
+	body {
 		overscroll-behavior-y: none !important;
 		overscroll-behavior: none !important;
 		-webkit-overflow-scrolling: touch !important;
 	}
-	
+
 	/* Pull-to-refresh 방지만 적용, 클릭 이벤트는 유지 */
 	/* body의 position: fixed와 overflow: hidden 제거하여 클릭 이벤트 보존 */
-	
+
 	/* 기존 overscroll-behavior 설정 강화 */
 	html {
 		overscroll-behavior: none !important;
 		overscroll-behavior-y: none !important;
 		overscroll-behavior-x: none !important;
 	}
-	
+
 	body {
 		overscroll-behavior: none !important;
 		overscroll-behavior-y: none !important;
@@ -41,82 +43,82 @@
 /* Header/Banner */
 @media (max-width: 1024px) {
 
-	.player-characteristics{
+	.player-characteristics {
 		max-width: 100%;
-	 }
-	 
+	}
+
 	/* 환영 섹션 모바일 스타일 */
 	.welcome-section {
 		padding: 2rem 1rem;
 		margin: 1rem 0;
 	}
-	
+
 	.welcome-header h1 {
 		font-size: 1.8rem;
 		margin-bottom: 0.8rem;
 	}
-	
+
 	.welcome-subtitle {
 		font-size: 1rem;
 	}
-	
+
 	.features-grid {
 		grid-template-columns: 1fr;
 		gap: 1rem;
 		margin-bottom: 2rem;
 	}
-	
+
 	.feature-card {
 		padding: 1rem;
 		flex-direction: column;
 		text-align: center;
 		gap: 0.8rem;
 	}
-	
+
 	.feature-icon {
 		font-size: 1.5rem;
 	}
-	
+
 	.feature-content h3 {
 		font-size: 1rem;
 	}
-	
+
 	.feature-content p {
 		font-size: 0.85rem;
 	}
-	
+
 	.usage-guide {
 		padding: 1.5rem;
 	}
-	
+
 	.usage-guide h3 {
 		font-size: 1.1rem;
 		margin-bottom: 1rem;
 	}
-	
+
 	.guide-step {
 		padding: 0.8rem;
 		flex-direction: column;
 		text-align: center;
 		gap: 0.5rem;
 	}
-	
+
 	.step-number {
 		width: 1.5rem;
 		height: 1.5rem;
 		font-size: 0.8rem;
 	}
-	
+
 	.step-text {
 		font-size: 0.9rem;
 	}
-	
+
 	/* 광고 컨테이너 모바일 스타일 */
 	.ad-container {
 		margin: 1rem 0;
 		padding: 0.8rem;
 	}
-	 
+
 	.main-header {
 		position: sticky;
 		top: 0;
@@ -526,8 +528,14 @@
 
 /* Player card - compact mobile layout */
 @media (max-width: 1024px) {
+	.player-rank-name-level-info {
+		width: 100%;
+		display: flex;
+		gap: 4px;
+	}
+
 	.player-basic-info .player-card {
-		display: grid;
+		/* display: grid; */
 		grid-template-columns: 48px 1fr;
 		/* left: grade image, right: info */
 		align-items: center;
@@ -548,12 +556,9 @@
 	/* Right info column */
 	.player-basic-info .player-card .player-info {
 		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		align-items: flex-start;
-		text-align: left;
-		margin-left: 6px;
-		/* add slight space from grade image */
+		align-items: center;
+		gap: 8px;
+		flex-direction: row;
 	}
 
 	/* Nickname single-line with ellipsis */
@@ -3524,15 +3529,14 @@
 /* 요즘 나의 경기는? 모바일 스타일 */
 @media (max-width: 1024px) {
 	.fun-data-section {
-		padding: 10px 14px;
+		padding: 12px 16px;
 		width: 100% !important;
 		max-width: 100% !important;
 		box-sizing: border-box !important;
 	}
-	
+
 	.fun-data-btn {
-		padding: 14px 16px;
-		font-size: 15px;
+		padding: 12px 16px;
 		min-height: 48px;
 		width: 100% !important;
 		max-width: 100% !important;
@@ -3547,14 +3551,15 @@
 		z-index: 1 !important;
 		overflow: visible !important;
 		box-sizing: border-box !important;
+		font-weight: 600 !important;
 	}
-	
+
 	/* 모바일에서 가상 요소 제거 */
 	.fun-data-btn::before,
 	.fun-data-btn::after {
 		display: none !important;
 	}
-	
+
 	.fun-data-btn .btn-icon,
 	.fun-data-btn .btn-text {
 		display: inline-block !important;
@@ -3564,164 +3569,164 @@
 		color: white !important;
 		flex-shrink: 0 !important;
 	}
-	
+
 	.btn-icon {
-		font-size: 18px;
+		font-size: 16px !important;
 	}
-	
+
 	.btn-text {
-		font-size: 15px;
+		font-size: 14px !important;
 	}
-	
-	
+
+
 	/* 요즘 나의 경기는? 팝업 모바일 최적화 */
 	.fun-data-popup-overlay {
 		background: rgba(0, 0, 0, 0.8);
 	}
-	
+
 	.fun-data-popup {
 		max-width: 95vw;
 		max-height: 90vh;
 		margin: 20px;
 	}
-	
+
 	.fun-data-popup .popup-header {
 		padding: 16px 20px;
 	}
-	
+
 	.fun-data-popup .popup-header h3 {
 		font-size: 16px;
 	}
-	
+
 	.fun-data-popup .popup-close {
 		width: 28px;
 		height: 28px;
 		font-size: 20px;
 	}
-	
+
 	/* 슬라이더 모바일 최적화 */
 	.slider-container {
 		padding: 16px;
 		min-height: 350px;
 	}
-	
+
 	.card-slider {
 		max-width: 100%;
 	}
-	
+
 	.fun-data-card {
 		padding: 0;
 		border-radius: 12px;
 	}
-	
+
 	.fun-data-card .card-header {
 		padding: 16px 20px;
 		border-radius: 10px 10px 0 0;
 	}
-	
+
 	.fun-data-card .card-header-content {
 		gap: 12px;
 	}
-	
+
 	.fun-data-card .card-emoji {
 		font-size: 28px;
 	}
-	
+
 	.fun-data-card .card-title {
 		font-size: 18px;
 	}
-	
+
 	.fun-data-card .card-content {
 		padding: 20px;
 	}
-	
+
 	.fun-data-card .card-description {
 		font-size: 15px;
 		padding: 14px;
 		margin-bottom: 16px;
 	}
-	
+
 	.fun-data-card .stat-item {
 		padding: 14px 16px;
 	}
-	
+
 	.fun-data-card .stat-label {
 		font-size: 13px;
 	}
-	
-	
-	
+
+
+
 	/* 모바일 로딩 스타일 - 박스 없이 */
 	.loading {
 		margin: 15px 20px;
 		padding: 0;
 		font-size: 13px;
 	}
-	
+
 	.nav-btn {
 		width: 40px;
 		height: 40px;
 		font-size: 20px;
 	}
-	
+
 	.prev-btn {
 		left: 10px;
 	}
-	
+
 	.next-btn {
 		right: 10px;
 	}
-	
+
 	.slider-indicators {
 		padding: 12px 16px;
 		gap: 6px;
 	}
-	
+
 	.indicator {
 		width: 6px;
 		height: 6px;
 	}
-	
+
 	.card-header {
 		gap: 10px;
 		margin-bottom: 10px;
 	}
-	
+
 	.card-emoji {
 		font-size: 20px;
 	}
-	
+
 	.card-title {
 		font-size: 15px;
 	}
-	
+
 	.card-description {
 		font-size: 13px;
 		margin-bottom: 12px;
 	}
-	
+
 	.stat-item {
 		padding: 6px 10px;
 	}
-	
+
 	.stat-label {
 		font-size: 11px;
 	}
-	
+
 	.stat-value {
 		font-size: 13px;
 	}
-	
+
 	.popup-footer {
 		padding: 12px 20px;
 	}
-	
+
 	.refresh-cards-btn {
 		padding: 12px 24px;
 		font-size: 15px;
 		min-height: 44px;
 	}
-	
+
 	.no-cards {
 		padding: 30px 16px;
 		font-size: 15px;
@@ -3730,26 +3735,30 @@
 
 /* 핵심 기능 섹션 모바일 개선 (데스크탑 레이아웃 변경 없음) */
 @media (max-width: 1024px) {
+
 	/* feature-list 컨테이너 */
 	.feature-list {
 		gap: var(--m-gap-md);
 		margin-bottom: 1.5rem;
 	}
-	
+
 	/* feature-item 카드 개선 */
 	.feature-item {
-		min-height: 56px; /* 최소 터치 타겟 크기 */
+		min-height: 56px;
+		/* 최소 터치 타겟 크기 */
 		border-radius: 12px;
 	}
-	
+
 	/* feature-header 개선 */
 	.feature-item .feature-header {
-		padding: 14px 16px; /* 충분한 패딩 */
-		min-height: 56px; /* 터치 타겟 크기 확보 */
+		padding: 14px 16px;
+		/* 충분한 패딩 */
+		min-height: 56px;
+		/* 터치 타겟 크기 확보 */
 		gap: 12px;
 		align-items: center;
 	}
-	
+
 	/* 아이콘 크기 조정 */
 	.feature-item .feature-icon {
 		font-size: 1.3rem;
@@ -3757,18 +3766,21 @@
 		width: 32px;
 		text-align: center;
 	}
-	
+
 	/* 제목 스타일 개선 */
 	.feature-item .feature-title {
 		font-size: 15px;
 		font-weight: 600;
 		line-height: 1.4;
 		flex: 1;
-		min-width: 0; /* 텍스트 잘림 방지 */
-		word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
-		overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
+		min-width: 0;
+		/* 텍스트 잘림 방지 */
+		word-break: keep-all;
+		/* 한글 단어 단위 줄바꿈 */
+		overflow-wrap: break-word;
+		/* 긴 단어 줄바꿈 */
 	}
-	
+
 	/* 토글 아이콘 크기 조정 */
 	.feature-item .feature-toggle-icon {
 		font-size: 10px;
@@ -3776,7 +3788,7 @@
 		width: 20px;
 		text-align: center;
 	}
-	
+
 	/* 콘텐츠 영역 초기 상태 (접혀있을 때) */
 	.feature-item .feature-content {
 		max-height: 0 !important;
@@ -3784,39 +3796,41 @@
 		padding: 0 16px !important;
 		transition: max-height var(--transition-normal), padding var(--transition-normal);
 	}
-	
+
 	/* 확장된 콘텐츠 영역 개선 */
 	.feature-item.expanded .feature-content {
 		max-height: 1000px !important;
 		padding: 16px !important;
 	}
-	
+
 	/* 콘텐츠 텍스트 개선 */
 	.feature-item .feature-content p {
 		font-size: 14px;
 		line-height: 1.7;
 		text-align: left;
-		word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
-		overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
+		word-break: keep-all;
+		/* 한글 단어 단위 줄바꿈 */
+		overflow-wrap: break-word;
+		/* 긴 단어 줄바꿈 */
 		margin: 0;
 	}
-	
+
 	/* strong 태그 스타일 */
 	.feature-item .feature-content strong {
 		font-weight: 600;
 		color: var(--text-primary);
 	}
-	
+
 	/* hover 효과 제거 (모바일에서는 불필요) */
 	.feature-item:hover {
 		border-color: var(--border-color);
 		box-shadow: none;
 	}
-	
+
 	.feature-item:hover .feature-header {
 		background: transparent;
 	}
-	
+
 	/* 확장된 상태에서만 배경색 변경 */
 	.feature-item.expanded .feature-header {
 		background: var(--bg-tertiary);
@@ -3830,24 +3844,24 @@
 		min-height: 52px;
 		gap: 10px;
 	}
-	
+
 	.feature-item .feature-icon {
 		font-size: 1.2rem;
 		width: 28px;
 	}
-	
+
 	.feature-item .feature-title {
 		font-size: 14px;
 	}
-	
+
 	.feature-item .feature-content {
 		padding: 0 14px !important;
 	}
-	
+
 	.feature-item.expanded .feature-content {
 		padding: 14px !important;
 	}
-	
+
 	.feature-item .feature-content p {
 		font-size: 13px;
 		line-height: 1.6;
@@ -3856,25 +3870,29 @@
 
 /* 패치노트 섹션 모바일 개선 (데스크탑 레이아웃 변경 없음) */
 @media (max-width: 1024px) {
+
 	/* notice-list 컨테이너 */
 	.notice-list {
 		gap: var(--m-gap-md);
 	}
-	
+
 	/* notice-item 카드 개선 */
 	.notice-item {
-		min-height: 56px; /* 최소 터치 타겟 크기 */
+		min-height: 56px;
+		/* 최소 터치 타겟 크기 */
 		border-radius: 12px;
 	}
-	
+
 	/* notice-header 개선 */
 	.notice-item .notice-header {
-		padding: 14px 16px; /* 충분한 패딩 */
-		min-height: 56px; /* 터치 타겟 크기 확보 */
+		padding: 14px 16px;
+		/* 충분한 패딩 */
+		min-height: 56px;
+		/* 터치 타겟 크기 확보 */
 		gap: 12px;
 		align-items: center;
 	}
-	
+
 	/* 콘텐츠 영역 초기 상태 (접혀있을 때) */
 	.notice-item .notice-content {
 		max-height: 0 !important;
@@ -3882,33 +3900,35 @@
 		padding: 0 16px !important;
 		transition: max-height var(--transition-normal), padding var(--transition-normal);
 	}
-	
+
 	/* 확장된 콘텐츠 영역 개선 */
 	.notice-item.expanded .notice-content {
 		max-height: 500px !important;
 		padding: 16px !important;
 	}
-	
+
 	/* 콘텐츠 텍스트 개선 */
 	.notice-item .notice-content p {
 		font-size: 14px;
 		line-height: 1.7;
 		text-align: left;
-		word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
-		overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
+		word-break: keep-all;
+		/* 한글 단어 단위 줄바꿈 */
+		overflow-wrap: break-word;
+		/* 긴 단어 줄바꿈 */
 		margin: 0;
 	}
-	
+
 	/* hover 효과 제거 (모바일에서는 불필요) */
 	.notice-item:hover {
 		border-color: var(--border-color);
 		box-shadow: none;
 	}
-	
+
 	.notice-item:hover .notice-header {
 		background: transparent;
 	}
-	
+
 	/* 확장된 상태에서만 배경색 변경 */
 	.notice-item.expanded .notice-header {
 		background: var(--bg-tertiary);
@@ -3922,15 +3942,15 @@
 		min-height: 52px;
 		gap: 10px;
 	}
-	
+
 	.notice-item .notice-content {
 		padding: 0 14px !important;
 	}
-	
+
 	.notice-item.expanded .notice-content {
 		padding: 14px !important;
 	}
-	
+
 	.notice-item .notice-content p {
 		font-size: 13px;
 		line-height: 1.6;
@@ -3943,7 +3963,7 @@
 		margin: 1rem auto;
 		padding: 0 0.75rem;
 	}
-	
+
 	.coupang-banner {
 		width: 100%;
 		max-width: 100%;
@@ -3952,16 +3972,16 @@
 		overflow: hidden;
 		border-radius: var(--radius-sm);
 	}
-	
+
 	/* 쿠팡 배너 내부 요소 반응형 처리 */
 	.coupang-banner iframe,
 	.coupang-banner div,
-	.coupang-banner script + div {
+	.coupang-banner script+div {
 		max-width: 100% !important;
 		width: 100% !important;
 		overflow-x: auto;
 	}
-	
+
 	.coupang-disclosure {
 		font-size: 0.65rem;
 		padding: 0 0.5rem;
@@ -3975,11 +3995,11 @@
 		margin: 0.75rem auto;
 		padding: 0 0.5rem;
 	}
-	
+
 	.coupang-banner {
 		padding: 0.25rem;
 	}
-	
+
 	.coupang-disclosure {
 		font-size: 0.6rem;
 		padding: 0 0.25rem;

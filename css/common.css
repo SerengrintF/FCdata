@@ -1170,6 +1170,12 @@ body.modal-open {
     line-height: 1.2;
 }
 
+.player-rank-name-level-info {
+		width:50%;
+		display: flex;
+		gap: 4px;
+	}
+
 /* 선수 경기 특징 스타일 - 간소화 */
 .player-characteristics {
     flex: 1;
